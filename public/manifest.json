@@ -1,0 +1,30 @@
+{
+    "name": "Office Management System",
+    "short_name": "OMS",
+    "description": "Manage staff tasks, attendance, and salary calculations",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#0ea5e9",
+    "icons": [
+        {
+            "src": "/icons/badge-72x72.webp",
+            "sizes": "72x72",
+            "type": "image/webp",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-192x192.webp",
+            "sizes": "192x192",
+            "type": "image/webp",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/icons/icon-512x512.webp",
+            "sizes": "512x512",
+            "type": "image/webp",
+            "purpose": "any"
+        }
+    ],
+    "orientation": "portrait"
+}
