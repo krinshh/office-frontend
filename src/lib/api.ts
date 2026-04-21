@@ -2,7 +2,7 @@
 
 import { useAuthStore } from './store';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE = ''; // Using relative paths for Vercel Rewrites
 
 const getAuthToken = () => {
   if (typeof window !== 'undefined') {
