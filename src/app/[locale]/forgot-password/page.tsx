@@ -33,13 +33,13 @@ export default function ForgotPasswordPage() {
 
   // Fetch CAPTCHA on mount
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' }).catch(() => { });
+    fetch(`/api/auth/csrf`, { credentials: 'include' }).catch(() => { });
     fetchCaptcha();
   }, []);
 
   const fetchCaptcha = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/captcha`);
+      const res = await fetch(`/api/auth/captcha`);
       if (res.ok) {
         const data = await res.json();
         setCaptcha({ question: data.question, token: data.captchaToken });
@@ -55,7 +55,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/forgot-password`, {
+      const response = await fetch(`/api/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

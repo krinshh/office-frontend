@@ -34,7 +34,7 @@ export default function ResetPasswordABCPage() {
 
     useEffect(() => {
         // Pre-fetch CSRF token
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' }).catch(() => { });
+        fetch(`/api/auth/csrf`, { credentials: 'include' }).catch(() => { });
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -57,7 +57,7 @@ export default function ResetPasswordABCPage() {
         try {
             const resetToken = params.token;
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/reset-password/${resetToken}`, {
+            const response = await fetch(`/api/auth/reset-password/${resetToken}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
