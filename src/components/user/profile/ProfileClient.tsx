@@ -85,6 +85,7 @@ export function ProfileClient() {
 
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [attendanceStats, setAttendanceStats] = useState<AttendanceStats>({
     totalPresent: 0,
     totalLate: 0,
@@ -177,6 +178,8 @@ export function ProfileClient() {
         }
       } catch (error) {
         console.error('Initialization error:', error);
+      } finally {
+        setPageLoading(false);
       }
     };
     initData();
@@ -356,6 +359,14 @@ export function ProfileClient() {
     setSelectedFile(null);
     setPreviewUrl(null);
   };
+
+  if (pageLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
   if (!user) {
     return (

@@ -40,7 +40,7 @@ export function UserAttendanceClient() {
   // or anyone allowed on this page.
   const canViewMap = hasPermission(PERMISSIONS.ATTENDANCE_VIEW_ALL) || !!user;
 
-  const { myAttendance, fetchMyAttendance } = useAttendanceStore();
+  const { myAttendance, fetchMyAttendance, isFetching: attendanceFetching } = useAttendanceStore();
   const {
     errors,
     success,
@@ -349,7 +349,7 @@ export function UserAttendanceClient() {
                     </div>
                   ))}
                 </div>
-              ) : (<EmptyAttendance onMarkAttendance={() => handleMarkIn()} />)}
+              ) : (!attendanceFetching.myAttendance && <EmptyAttendance onMarkAttendance={() => handleMarkIn()} />)}
             </div>
           </div>
         </Card>

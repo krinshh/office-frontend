@@ -10,12 +10,14 @@ interface AttendanceMonthlyDetailsProps {
   monthlyAttendance: any[];
   user: any;
   filters: { user: string };
+  isLoading?: boolean;
 }
 
 export const AttendanceMonthlyDetails = ({
   monthlyAttendance,
   user,
-  filters
+  filters,
+  isLoading = false
 }: AttendanceMonthlyDetailsProps) => {
   const t = useTranslations();
 
@@ -36,7 +38,21 @@ export const AttendanceMonthlyDetails = ({
       </div>
 
       {filters.user ? (
-        monthlyAttendance.length > 0 ? (
+        isLoading ? (
+          <div className="space-y-4 md:space-y-6 animate-pulse">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={`skeleton-${i}`} className="p-4 border border-border/60 rounded-xl">
+                <div className="flex gap-4">
+                  <div className="h-12 w-12 bg-muted rounded-xl"></div>
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-1/3 bg-muted rounded"></div>
+                    <div className="h-3 w-1/4 bg-muted rounded"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : monthlyAttendance.length > 0 ? (
           <div className="space-y-4 md:space-y-6">
             {monthlyAttendance.map((record) => (
               <div key={record._id} className="group p-4 border border-border/60 rounded-xl hover:bg-muted/30 transition-all duration-200">

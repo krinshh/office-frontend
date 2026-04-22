@@ -17,6 +17,7 @@ interface SalaryTableProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   onDownloadSlip: (salary: any) => void;
+  isLoading?: boolean;
 }
 
 export const SalaryTable = ({
@@ -25,7 +26,8 @@ export const SalaryTable = ({
   currentPage,
   totalPages,
   onPageChange,
-  onDownloadSlip
+  onDownloadSlip,
+  isLoading = false
 }: SalaryTableProps) => {
   const t = useTranslations();
   const locale = useLocale();
@@ -47,7 +49,20 @@ export const SalaryTable = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-border bg-card">
-            {paginatedSalaries.map((salary: any) => (
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={`skeleton-${i}`} className="animate-pulse">
+                  <td className="py-4 px-6"><div className="h-4 w-32 bg-muted rounded"></div></td>
+                  <td className="py-4 px-6"><div className="h-4 w-20 bg-muted rounded"></div></td>
+                  <td className="py-4 px-6"><div className="h-4 w-24 bg-muted rounded"></div></td>
+                  <td className="py-4 px-6"><div className="h-4 w-24 bg-muted rounded"></div></td>
+                  <td className="py-4 px-6"><div className="h-4 w-24 bg-muted rounded"></div></td>
+                  <td className="py-4 px-6"><div className="h-4 w-32 bg-muted rounded"></div></td>
+                  <td className="py-4 px-6"><div className="h-6 w-16 bg-muted rounded-full"></div></td>
+                  <td className="py-4 px-6"><div className="flex justify-center gap-2"><div className="h-8 w-8 bg-muted rounded"></div><div className="h-8 w-8 bg-muted rounded"></div></div></td>
+                </tr>
+              ))
+            ) : paginatedSalaries.map((salary: any) => (
               <tr key={salary._id} className="hover:bg-muted/30 transition-colors">
                 <td className="py-4 px-6">
                   <div className="flex items-center gap-2 font-medium whitespace-nowrap">
@@ -109,7 +124,7 @@ export const SalaryTable = ({
                 </td>
               </tr>
             ))}
-            {totalRecords === 0 && (
+            {!isLoading && totalRecords === 0 && (
               <tr>
                 <td colSpan={8} className="py-12 text-center text-muted-foreground">
                   <div className="flex flex-col items-center justify-center">

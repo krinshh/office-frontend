@@ -47,6 +47,7 @@ export function UserTasksClient() {
   const {
     errors,
     success,
+    loading,
     setLoading,
     handleError,
     handleSuccess,
@@ -168,7 +169,7 @@ export function UserTasksClient() {
 
 
       <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 md:gap-6 lg:gap-8">
-        {filteredTasks.length > 0 ? (
+        {(filteredTasks.length > 0) ? (
           filteredTasks.map((task: any) => {
             const myAssignment = assignments.find(a => a.task._id === task._id && a.assignedTo.some(u => u._id === user?.id));
             return (
@@ -186,7 +187,7 @@ export function UserTasksClient() {
               />
             );
           })
-        ) : (
+        ) : !loading && (
           <div className="col-span-full flex justify-center min-h-[60vh]">
             <EmptyTasks isAdmin={false} />
           </div>

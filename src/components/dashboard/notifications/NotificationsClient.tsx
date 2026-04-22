@@ -31,7 +31,8 @@ export function NotificationsClient() {
     fetchNotifications,
     markAsRead: storeMarkAsRead,
     markAllAsRead: storeMarkAllAsRead,
-    unreadCount: storeUnreadCount
+    unreadCount: storeUnreadCount,
+    isFetching
   } = useNotificationStore();
 
   const {
@@ -158,7 +159,7 @@ export function NotificationsClient() {
                 />
               ))}
             </div>
-          ) : (
+          ) : !isFetching.list && (
             <div className="py-12 flex flex-col items-center">
               <EmptyNotifications />
             </div>

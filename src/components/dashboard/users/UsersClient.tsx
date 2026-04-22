@@ -287,7 +287,7 @@ export function UsersClient() {
         <div ref={lastUserElementRef} className="flex justify-center py-6"><Loading type="spinner" /></div>
       )}
 
-      {users.length === 0 && <EmptyUsers onAddUser={() => setShowUserModal(true)} />}
+      {!isFetching.users && users.length === 0 && <EmptyUsers onAddUser={() => setShowUserModal(true)} />}
 
       <Modal isOpen={showUserModal} onClose={() => { setShowUserModal(false); setEditingUserId(null); }} title={editingUser ? t('users.editUser') : t('users.addNewUser')} size="lg" scrollable>
         <UserFormModalContent

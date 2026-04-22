@@ -68,7 +68,8 @@ export function TaskAdminClient() {
     offices, userTypes, users,
     fetchOffices: storeFetchOffices,
     fetchUserTypes: storeFetchUserTypes,
-    fetchUsers: storeFetchUsers
+    fetchUsers: storeFetchUsers,
+    isFetching: appFetching
   } = useAppStore();
 
   const {
@@ -624,7 +625,7 @@ export function TaskAdminClient() {
               }}
             />
           );
-        }) : (
+        }) : !isFetching.tasks && !isFetching.assignments && !appFetching.offices && !appFetching.userTypes && (
           <div className="col-span-full flex justify-center min-h-[60vh]">
             <EmptyTasks
               isAdmin={true}

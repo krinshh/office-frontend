@@ -16,10 +16,12 @@ interface OfficeStats {
 
 interface AttendanceOfficeStatsProps {
   officeWiseStats: OfficeStats[];
+  isLoading?: boolean;
 }
 
 export const AttendanceOfficeStats = ({
-  officeWiseStats
+  officeWiseStats,
+  isLoading = false
 }: AttendanceOfficeStatsProps) => {
   const t = useTranslations();
 
@@ -34,7 +36,20 @@ export const AttendanceOfficeStats = ({
         </h2>
       </div>
 
-      {officeWiseStats.length > 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 animate-pulse">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={`skeleton-${i}`} className="p-5 border border-border/60 rounded-xl">
+              <div className="h-6 w-32 bg-muted rounded mb-4"></div>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="h-16 bg-muted rounded"></div>
+                <div className="h-16 bg-muted rounded"></div>
+              </div>
+              <div className="h-1.5 bg-muted rounded-full w-full"></div>
+            </div>
+          ))}
+        </div>
+      ) : officeWiseStats.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {officeWiseStats.map((stat, index) => (
             <div key={index} className="p-5 border border-border/60 rounded-xl hover:border-border hover:bg-muted/30 transition-all duration-200">

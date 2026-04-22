@@ -43,7 +43,7 @@ export function SalaryClient() {
   // Store states
   const { offices, userTypes, users, fetchOffices, fetchUserTypes, fetchUsers } = useAppStore();
   const { fetchConfig, fetchHRASlabs } = useConfigStore();
-  const { salaries, fetchSalaries, addMultipleSalaries } = useSalaryStore();
+  const { salaries, fetchSalaries, addMultipleSalaries, isFetching } = useSalaryStore();
 
   // Generation Form Filters
   const [generateOffice, setGenerateOffice] = useState('');
@@ -332,6 +332,7 @@ export function SalaryClient() {
           totalPages={totalPages}
           onPageChange={setCurrentPage}
           onDownloadSlip={downloadSalarySlip}
+          isLoading={isFetching}
         />
       </Card>
     </div>

@@ -106,7 +106,18 @@ export const AuditTable = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-border bg-card">
-            {logs.map((log: any) => (
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={`skeleton-${i}`} className="animate-pulse">
+                  <td className="py-4 px-6"><div className="h-4 w-32 bg-muted rounded"></div></td>
+                  <td className="py-4 px-6"><div className="h-4 w-20 bg-muted rounded"></div></td>
+                  <td className="py-4 px-6"><div className="h-4 w-24 bg-muted rounded"></div></td>
+                  <td className="py-4 px-6"><div className="h-4 w-40 bg-muted rounded"></div></td>
+                  <td className="py-4 px-6"><div className="h-4 w-32 bg-muted rounded"></div></td>
+                  <td className="py-4 px-6"><div className="h-4 w-24 bg-muted rounded"></div></td>
+                </tr>
+              ))
+            ) : logs.map((log: any) => (
               <tr key={log._id} className="hover:bg-muted/30 transition-colors">
                 <td className="py-4 px-6 text-foreground">
                   <div className="flex items-center gap-2 font-medium">

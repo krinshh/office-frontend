@@ -50,7 +50,8 @@ export function AttendanceClient() {
   const {
     livePresence,
     adminSelectedUserAttendance: monthlyAttendance, fetchUserMonthlyAttendance,
-    fetchLivePresence
+    fetchLivePresence,
+    isFetching
   } = useAttendanceStore();
 
   const {
@@ -222,9 +223,11 @@ export function AttendanceClient() {
           <AttendanceLivePresence
             filteredLivePresence={filteredLivePresence}
             activeFilteredCount={activeFilteredCount}
+            isLoading={isFetching.livePresence}
           />
           <AttendanceOfficeStats
             officeWiseStats={stats.officeWiseStats}
+            isLoading={isFetching.livePresence} // Using livePresence loading for stats too since they come together
           />
         </>
       ) : (
@@ -232,6 +235,7 @@ export function AttendanceClient() {
           monthlyAttendance={monthlyAttendance}
           user={users.find(u => u._id === filters.user)}
           filters={filters}
+          isLoading={isFetching.adminSelectedUserAttendance}
         />
       )}
     </div>

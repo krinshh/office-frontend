@@ -72,7 +72,7 @@ export function OfficesClient() {
   const { user } = useAuthStore();
 
   // Data
-  const { offices, fetchOffices: storeFetchOffices, lastFetched, removeOffice } = useAppStore();
+  const { offices, fetchOffices: storeFetchOffices, lastFetched, removeOffice, isFetching } = useAppStore();
   const {
     errors,
     success,
@@ -444,7 +444,7 @@ export function OfficesClient() {
       </div>
 
       {/* Empty State */}
-      {offices.length === 0 && (
+      {!isFetching.offices && offices.length === 0 && (
         <EmptyOffices onAddOffice={() => setShowModal(true)} />
       )}
 

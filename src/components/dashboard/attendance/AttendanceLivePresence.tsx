@@ -11,8 +11,9 @@ interface LivePresenceProps {
 
 export const AttendanceLivePresence = ({
   filteredLivePresence,
-  activeFilteredCount
-}: LivePresenceProps) => {
+  activeFilteredCount,
+  isLoading = false
+}: LivePresenceProps & { isLoading?: boolean }) => {
   const t = useTranslations();
 
   return (
@@ -35,7 +36,15 @@ export const AttendanceLivePresence = ({
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-        {filteredLivePresence.length > 0 ? (
+        {isLoading ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <div key={`skeleton-${i}`} className="flex flex-col items-center animate-pulse">
+              <div className="w-20 h-20 rounded-2xl bg-muted mb-3"></div>
+              <div className="h-3 w-16 bg-muted rounded mb-2"></div>
+              <div className="h-2 w-12 bg-muted rounded"></div>
+            </div>
+          ))
+        ) : filteredLivePresence.length > 0 ? (
           filteredLivePresence.map((person) => (
             <div key={person._id} className="relative group flex flex-col items-center">
               <div className="relative w-20 h-20 rounded-2xl overflow-hidden mb-3 border-2 border-border group-hover:border-primary/50 transition-all duration-300 shadow-sm group-hover:shadow-md">
