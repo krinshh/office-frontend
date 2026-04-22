@@ -32,6 +32,8 @@ export const getPhotoUrl = (photoPath?: string, updatedAt?: string) => {
     const fullUrl = photoPath.startsWith('http') ? photoPath : `${baseUrl}${photoPath}`;
     
     // Add cache buster using updatedAt timestamp
-    const version = updatedAt ? new Date(updatedAt).getTime() : Date.now();
+    if (!updatedAt) return fullUrl;
+    
+    const version = new Date(updatedAt).getTime();
     return `${fullUrl}${fullUrl.includes('?') ? '&' : '?' }v=${version}`;
 };

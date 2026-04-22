@@ -160,6 +160,27 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                     fetchConfig(true);
                     fetchHRASlabs(true);
                 }
+
+                // Initial login / reconnect profile refresh to ensure image sync
+                api.auth.getMe().then(res => {
+                    if (res.ok) {
+                        res.json().then(data => {
+                            updateUserData({ ...data, id: data._id });
+                            
+                            // Ask for user image if missing on initial sync
+                            if (!data.photo) {
+                                addToast({
+                                    title: t('auth.completeProfile'),
+                                    message: t('auth.pleaseUploadPhoto'),
+                                    type: 'info',
+                                    duration: 10000,
+                                    actionPath: '/user/profile',
+                                    actionLabel: t('userProfile.buttons.editProfile')
+                                });
+                            }
+                        });
+                    }
+                }).catch(() => { });
             });
 
             s.on('disconnect', () => {
@@ -294,7 +315,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                         name: userData.name, email: userData.email, mobile: userData.mobile,
                         userType: userData.userType, office: userData.office, photo: userData.photo,
                         shiftTimings: userData.shiftTimings, accountDetails: userData.accountDetails,
-                        joiningDate: userData.joiningDate
+                        joiningDate: userData.joiningDate, updatedAt: userData.updatedAt
                     });
                 }
             }, 500));

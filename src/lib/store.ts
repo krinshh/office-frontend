@@ -26,6 +26,7 @@ interface User {
   VPF?: number;
   oneTimeJoiningBonus?: number;
   gratuity?: number;
+  updatedAt?: string;
 }
 
 interface AuthState {
