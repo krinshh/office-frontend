@@ -2,14 +2,18 @@
 
 import React from 'react';
 import Shield from 'lucide-react/dist/esm/icons/shield';
+import NextImage from 'next/image';
 
 export function VisualImpact() {
   return (
     <div className="hidden lg:flex w-full lg:w-1/2 h-full bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex-col items-center justify-center p-8 relative overflow-hidden">
       <div className="absolute inset-0 z-10 bg-gradient-to-tr from-blue-900 to-transparent" />
-      <img
+      <NextImage
         src="/login-bg.webp"
         alt="Modern Office"
+        fill
+        priority={false}
+        loading="lazy"
         className="absolute inset-0 w-full h-full object-cover scale-105 animate-pulse-slow"
         style={{ animationDuration: '8s' }}
       />
