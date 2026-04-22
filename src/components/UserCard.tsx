@@ -11,7 +11,7 @@ import Building from 'lucide-react/dist/esm/icons/building';
 import Calendar from 'lucide-react/dist/esm/icons/calendar';
 import IndianRupee from 'lucide-react/dist/esm/icons/indian-rupee';
 import Trash2 from 'lucide-react/dist/esm/icons/trash-2';
-import { formatPhone, formatCurrency, formatDate } from '@/utils/formatters';
+import { formatPhone, formatCurrency, formatDate, getPhotoUrl } from '@/utils/formatters';
 
 interface User {
   _id: string;
@@ -44,7 +44,7 @@ const UserCard: React.FC<UserCardProps> = React.memo(({ user, onEdit, onDelete, 
       <div className="flex items-start justify-between mb-2">
         {user.photo ? (
           <ImagePreview
-            src={user.photo.startsWith('http') ? user.photo : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${user.photo}${user.updatedAt ? `?v=${new Date(user.updatedAt).getTime()}` : ''}`}
+            src={getPhotoUrl(user.photo, user.updatedAt) || ''}
             alt={user.name}
             className="w-12 h-12"
             thumbnailClassName="w-12 h-12 rounded-xl object-cover shadow-lg"

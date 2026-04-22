@@ -11,6 +11,7 @@ import Alert from '@/components/Alert';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { api } from '@/lib/api';
 import { VALID_REGEX } from '@/constants/regex';
+import { getPhotoUrl } from '@/utils/formatters';
 
 interface UserFormModalContentProps {
   editingUser: any;
@@ -313,7 +314,7 @@ export const UserFormModalContent = ({
                   src={
                     userData.photo instanceof File
                       ? URL.createObjectURL(userData.photo)
-                      : (editingUser?.photo?.startsWith('http') ? editingUser.photo : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${editingUser?.photo}`)
+                      : getPhotoUrl(editingUser?.photo, editingUser?.updatedAt)
                   }
                   alt="Profile Preview"
                   className="w-16 h-16 rounded-full object-cover border shadow-sm"

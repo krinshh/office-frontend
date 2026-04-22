@@ -15,6 +15,7 @@ import { NotificationBell } from './NotificationBell';
 import { api } from '@/lib/api';
 import { usePermissions } from '@/hooks/usePermissions';
 import { PERMISSIONS } from '@/constants/permissions';
+import { getPhotoUrl } from '@/utils/formatters';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -98,9 +99,17 @@ const Header: React.FC<HeaderProps> = React.memo(({ onMenuClick, title }) => {
 
           <div className="hidden md:flex items-center gap-2 text-sm h-9">
             <div className="flex items-center gap-2">
-              <div className={`w-9 h-9 ${accentBg} rounded-full flex items-center justify-center transition-colors duration-300`}>
+            <div className={`w-9 h-9 ${accentBg} rounded-full flex items-center justify-center overflow-hidden transition-colors duration-300 shadow-sm border border-border`}>
+              {user?.photo ? (
+                <img
+                  src={getPhotoUrl(user.photo, (user as any).updatedAt)}
+                  alt={user?.name || 'User'}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
                 <User className={`w-5 h-5 ${accentColor} transition-colors duration-300`} />
-              </div>
+              )}
+            </div>
               <div className="hidden lg:block">
                 <p className="font-medium text-foreground">
                   {user?.name || 'User'}

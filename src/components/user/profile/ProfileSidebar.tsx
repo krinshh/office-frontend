@@ -5,7 +5,7 @@ import Calendar from 'lucide-react/dist/esm/icons/calendar';
 import Camera from 'lucide-react/dist/esm/icons/camera';
 import { Card, FormField, ImagePreview, Select, Input } from '@/components';
 import { useTranslations } from 'next-intl';
-import { formatPhone } from '@/utils/formatters';
+import { formatPhone, getPhotoUrl } from '@/utils/formatters';
 import { VALID_REGEX } from '@/constants/regex';
 
 const COUNTRY_CODES = [
@@ -54,7 +54,7 @@ export const ProfileSidebar = ({
         <div className="relative group">
           {previewUrl || user.photo ? (
             <ImagePreview
-              src={previewUrl || (user.photo && (user.photo.startsWith('http') ? user.photo : `${process.env.NEXT_PUBLIC_API_URL}/${user.photo.replace(VALID_REGEX.IMAGE_PATH_CLEAN, '')}`))}
+              src={previewUrl || getPhotoUrl(user.photo, user.updatedAt) || ''}
               alt={user.name}
               className="w-32 h-32 mb-4 md:mb-6"
               thumbnailClassName="w-32 h-32 rounded-full object-cover border-4 border-background shadow-xl"

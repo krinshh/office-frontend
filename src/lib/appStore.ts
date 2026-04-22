@@ -24,11 +24,17 @@ interface SimpleUser {
   _id: string;
   name: string;
   email: string;
+  mobile: string;
   photo?: string;
   office?: any;
   userType?: any;
   isActive?: boolean;
   joiningDate?: string;
+  ctc?: number;
+  baseSalary?: number;
+  ta?: number;
+  vpf?: number;
+  gratuity?: number;
   deactivatedAt?: string;
   updatedAt?: string; // Used for Timestamp Guard
 }

@@ -9,7 +9,7 @@ import Mail from 'lucide-react/dist/esm/icons/mail';
 import Phone from 'lucide-react/dist/esm/icons/phone';
 import User from 'lucide-react/dist/esm/icons/user';
 import Calendar from 'lucide-react/dist/esm/icons/calendar';
-import { formatPhone, formatCurrency, formatDate } from '@/utils/formatters';
+import { formatPhone, formatCurrency, formatDate, getPhotoUrl } from '@/utils/formatters';
 
 interface FullUser {
   _id: string;
@@ -56,7 +56,7 @@ export const UserViewModalContent = ({
       <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 border-b pb-4 md:pb-6">
         {user.photo ? (
           <ImagePreview
-            src={user.photo.startsWith('http') ? user.photo : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${user.photo}`}
+            src={getPhotoUrl(user.photo, (user as any).updatedAt) || ''}
             alt={user.name}
             className="w-24 h-24 shrink-0"
             thumbnailClassName="w-24 h-24 rounded-full object-cover shadow-sm border-2 border-primary/20"

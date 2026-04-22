@@ -98,8 +98,11 @@ export function UsersClient() {
 
   const [showUserModal, setShowUserModal] = useState(false);
   const [showUserTypeModal, setShowUserTypeModal] = useState(false);
-  const [editingUser, setEditingUser] = useState<FullUser | null>(null);
-  const [viewingUser, setViewingUser] = useState<FullUser | null>(null);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [viewingUserId, setViewingUserId] = useState<string | null>(null);
+  
+  const editingUser = useMemo(() => (users as any[]).find((u) => u._id === editingUserId) as FullUser | null, [users, editingUserId]);
+  const viewingUser = useMemo(() => (users as any[]).find((u) => u._id === viewingUserId) as FullUser | null, [users, viewingUserId]);
   const [submitting, setSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
@@ -255,7 +258,7 @@ export function UsersClient() {
         hasCreatePermission={hasPermission(PERMISSIONS.USERS_CREATE)}
         setShowRolesListModal={setShowRolesListModal}
         setShowUserModal={setShowUserModal}
-        setEditingUser={setEditingUser}
+        setEditingUser={(u) => setEditingUserId(u ? (u._id || (u as any).id) : null)}
       />
 
       {success && <Alert type="success" message={success} onClose={() => setSuccess('')} />}
@@ -271,10 +274,11 @@ export function UsersClient() {
                 _id: u._id, name: u.name, email: u.email, mobile: u.mobile,
                 userType: u.userType ? { name: u.userType.name } : undefined,
                 office: u.office ? { name: u.office.name } : undefined,
-                photo: u.photo, ctc: u.ctc, joiningDate: u.joiningDate, updatedAt: u.updatedAt
+                photo: u.photo,
+                ctc: u.ctc, joiningDate: u.joiningDate, updatedAt: u.updatedAt
               }}
-              onView={() => setViewingUser(u)}
-              onEdit={() => { setEditingUser(u); setShowUserModal(true); }}
+              onView={() => u._id && setViewingUserId(u._id)}
+              onEdit={() => { u._id && setEditingUserId(u._id); setShowUserModal(true); }}
               onDelete={() => handleDeactivateUser(u)}
             />
           ))}
@@ -287,28 +291,43 @@ export function UsersClient() {
 
       {users.length === 0 && <EmptyUsers onAddUser={() => setShowUserModal(true)} />}
 
-      <Modal isOpen={showUserModal} onClose={() => { setShowUserModal(false); setEditingUser(null); }} title={editingUser ? t('users.editUser') : t('users.addNewUser')} size="lg" scrollable>
+      <Modal isOpen={showUserModal} onClose={() => { setShowUserModal(false); setEditingUserId(null); }} title={editingUser ? t('users.editUser') : t('users.addNewUser')} size="lg" scrollable>
         <UserFormModalContent
           editingUser={editingUser}
           userTypeOptions={userTypeOptions}
           officeOptions={officeOptions}
           userTypes={userTypes}
-          onClose={() => { setShowUserModal(false); setEditingUser(null); }}
+          onClose={() => { setShowUserModal(false); setEditingUserId(null); }}
           onSuccess={(res) => {
-            setSuccess(editingUser ? t('users.success.userUpdated') : t('users.success.userCreated'));
+            setSuccess(editingUserId ? t('users.success.userUpdated') : t('users.success.userCreated'));
             setShowUserModal(false);
             addOrUpdateUser(res?.user || res);
-            setEditingUser(null);
+            setEditingUserId(null);
           }}
         />
       </Modal>
 
-      <Modal isOpen={!!viewingUser} onClose={() => setViewingUser(null)} title={t('users.viewUser') || 'View Profile'} size="lg" scrollable>
-        {viewingUser && <UserViewModalContent
-          user={viewingUser}
-          onEdit={() => { const u = viewingUser; setViewingUser(null); setEditingUser(u); setShowUserModal(true); }}
-          onDelete={() => { const u = viewingUser; setViewingUser(null); handleDeactivateUser(u); }}
-        />}
+      <Modal isOpen={!!viewingUserId} onClose={() => setViewingUserId(null)} title={t('users.viewUser') || 'View Profile'} size="lg" scrollable>
+        {viewingUser ? (
+          <UserViewModalContent
+            user={viewingUser}
+            onEdit={() => {
+              const id = viewingUser?._id;
+              if (id) {
+                setViewingUserId(null);
+                setEditingUserId(id);
+                setShowUserModal(true);
+              }
+            }}
+            onDelete={() => {
+              const u = viewingUser;
+              if (u) {
+                setViewingUserId(null);
+                handleDeactivateUser(u);
+              }
+            }}
+          />
+        ) : null}
       </Modal>
 
       <Modal isOpen={showRolesListModal} onClose={() => setShowRolesListModal(false)} title={t('users.manageRoles') || 'Manage Roles'} size="md" scrollable>

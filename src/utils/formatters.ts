@@ -24,3 +24,14 @@ export const formatDate = (dateString: string) => {
   if (!dateString) return '-';
   return new Date(dateString).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
 };
+
+export const getPhotoUrl = (photoPath?: string, updatedAt?: string) => {
+    if (!photoPath) return undefined;
+    
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const fullUrl = photoPath.startsWith('http') ? photoPath : `${baseUrl}${photoPath}`;
+    
+    // Add cache buster using updatedAt timestamp
+    const version = updatedAt ? new Date(updatedAt).getTime() : Date.now();
+    return `${fullUrl}${fullUrl.includes('?') ? '&' : '?' }v=${version}`;
+};
