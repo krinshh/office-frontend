@@ -39,7 +39,7 @@ export default function LoginPage() {
       setRememberMe(true);
     }
     // Pre-fetch CSRF token cookie
-    fetch(`/api/auth/csrf`, { credentials: 'include' }).catch(() => { });
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' }).catch(() => { });
   }, []);
 
   // Auto-logout if visiting login page while authenticated
@@ -76,11 +76,11 @@ export default function LoginPage() {
       // Ensure CSRF cookie exists
       const csrfCookie = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
       if (!csrfCookie) {
-        await fetch(`/api/auth/csrf`, { credentials: 'include' });
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' });
       }
       const csrfToken = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)?.[1] ?? '';
 
-      const response = await fetch(`/api/auth/send-otp`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-csrf-token': decodeURIComponent(csrfToken) },
         body: JSON.stringify({ email }),
@@ -127,7 +127,7 @@ export default function LoginPage() {
       sessionStorage.clear();
 
       const csrfToken = decodeURIComponent(document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)?.[1] ?? '');
-      const response = await fetch(`/api/auth/verify-otp`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
         body: JSON.stringify({ email, otp }),
@@ -178,7 +178,7 @@ export default function LoginPage() {
       sessionStorage.clear();
 
       const csrfToken = decodeURIComponent(document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)?.[1] ?? '');
-      const response = await fetch(`/api/auth/login`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
         body: JSON.stringify({ username, password }),
