@@ -57,6 +57,8 @@ interface TaskState {
   fetchTasks: (force?: boolean) => Promise<void>;
   fetchAssignments: (force?: boolean) => Promise<void>;
   fetchMonthlyStats: (force?: boolean) => Promise<void>;
+  updateOfficeInTasks: (officeId: string, officeName: string) => void;
+  updateUserTypeInTasks: (typeId: string, typeName: string) => void;
 }
 
 import { api } from './api';
@@ -217,5 +219,33 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     } finally {
       set(state => ({ isFetching: { ...state.isFetching, assignments: false } }));
     }
-  }
+  },
+  updateOfficeInTasks: (officeId, officeName) => set((state) => ({
+    tasks: state.tasks.map(t => 
+      (t.office && (t.office._id === officeId || (t.office as any) === officeId))
+        ? { ...t, office: { ...t.office, name: officeName } }
+        : t
+    ),
+    assignments: state.assignments.map(a => {
+      let taskUpdated = a.task;
+      if (a.task?.office && (a.task.office._id === officeId || (a.task.office as any) === officeId)) {
+        taskUpdated = { ...a.task, office: { ...a.task.office, name: officeName } };
+      }
+      return { ...a, task: taskUpdated };
+    })
+  })),
+  updateUserTypeInTasks: (typeId, typeName) => set((state) => ({
+    tasks: state.tasks.map(t => 
+      (t.userCategory && (t.userCategory._id === typeId || (t.userCategory as any) === typeId))
+        ? { ...t, userCategory: { ...t.userCategory, name: typeName } }
+        : t
+    ),
+    assignments: state.assignments.map(a => {
+      let taskUpdated = a.task;
+      if (a.task?.userCategory && (a.task.userCategory._id === typeId || (a.task.userCategory as any) === typeId)) {
+        taskUpdated = { ...a.task, userCategory: { ...a.task.userCategory, name: typeName } };
+      }
+      return { ...a, task: taskUpdated };
+    })
+  }))
 }));

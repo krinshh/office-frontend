@@ -43,6 +43,7 @@ interface SalaryState {
   addMultipleSalaries: (salaries: Salary[]) => void;
   fetchSalaries: (force?: boolean, isAdmin?: boolean) => Promise<void>;
   clearCache: () => void;
+  updateUserInSalaries: (userId: string, name: string, photo?: string) => void;
 }
 
 export const useSalaryStore = create<SalaryState>((set, get) => ({
@@ -107,5 +108,13 @@ export const useSalaryStore = create<SalaryState>((set, get) => ({
       set({ isFetching: false });
     }
   },
-  clearCache: () => set({ salaries: [], lastFetched: null, isStale: true, isAdminCache: false })
+  clearCache: () => set({ salaries: [], lastFetched: null, isStale: true, isAdminCache: false }),
+  updateUserInSalaries: (userId, name, photo) => set((state) => ({
+    salaries: state.salaries.map(s => 
+      (s.user && (s.user._id === userId || (s.user as any) === userId))
+        ? { ...s, user: { ...s.user, name, photo: photo || s.user.photo } }
+        : s
+    )
+  }))
 }));
+

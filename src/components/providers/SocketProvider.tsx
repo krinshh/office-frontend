@@ -267,10 +267,28 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 }
             }, 300));
 
-            s.on('sync:office_updated', throttle((officeData: any) => addOrUpdateOffice(officeData), 500));
-            s.on('sync:user_type_updated', throttle((typeData: any) => addOrUpdateUserType(typeData), 500));
+            s.on('sync:office_updated', throttle((officeData: any) => {
+                addOrUpdateOffice(officeData);
+                // Propagate to all relevant stores for mixed data sync
+                if (officeData._id && officeData.name) {
+                    useTaskStore.getState().updateOfficeInTasks(officeData._id, officeData.name);
+                    useAttendanceStore.getState().updateOfficeInAttendance(officeData._id, officeData.name);
+                }
+            }, 500));
+            s.on('sync:user_type_updated', throttle((typeData: any) => {
+                addOrUpdateUserType(typeData);
+                // Propagate to all relevant stores
+                if (typeData._id && typeData.name) {
+                    useTaskStore.getState().updateUserTypeInTasks(typeData._id, typeData.name);
+                }
+            }, 500));
             s.on('sync:user_updated', throttle((userData: any) => {
                 addOrUpdateUser(userData);
+                // Propagate to Salaries and Attendance
+                if (userData._id && userData.name) {
+                    useSalaryStore.getState().updateUserInSalaries(userData._id, userData.name, userData.photo);
+                    useAttendanceStore.getState().updateUserInAttendance(userData._id, userData.name, userData.photo);
+                }
                 if (currentUser && currentUser.id === userData._id) {
                     updateUserData({
                         name: userData.name, email: userData.email, mobile: userData.mobile,

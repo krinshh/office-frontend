@@ -73,7 +73,8 @@ interface AttendanceState {
   updateLivePresenceNode: (node: LivePresence) => void;
   updateAdminViewedAttendance: (record: AttendanceRecord) => void;
   setDailyStats: (stats: OfficeStats[]) => void;
-  
+  updateUserInAttendance: (userId: string, name: string, photo?: string) => void;
+  updateOfficeInAttendance: (officeId: string, officeName: string) => void;
   clearStore: () => void;
 }
 
@@ -344,6 +345,31 @@ export const useAttendanceStore = create<AttendanceState>((set, get) => ({
     dailyStats: stats, 
     lastFetched: { ...get().lastFetched, dailyStats: Date.now() } 
   }),
+  updateUserInAttendance: (userId, name, photo) => set((state) => ({
+    livePresence: state.livePresence.map(p => 
+      p._id === userId ? { ...p, name, photo: photo || p.photo } : p
+    ),
+    myAttendance: state.myAttendance.map(a => 
+      (a.user && (a.user._id === userId || (a.user as any) === userId))
+        ? { ...a, user: { ...a.user, name, photo: photo || a.user.photo } }
+        : a
+    ),
+    adminSelectedUserAttendance: state.adminSelectedUserAttendance.map(a => 
+      (a.user && (a.user._id === userId || (a.user as any) === userId))
+        ? { ...a, user: { ...a.user, name, photo: photo || a.user.photo } }
+        : a
+    )
+  })),
+  updateOfficeInAttendance: (officeId, officeName) => set((state) => ({
+    myAttendance: state.myAttendance.map(a => 
+      (a.office && (a.office._id === officeId || (a.office as any) === officeId))
+        ? { ...a, office: { ...a.office, name: officeName } }
+        : a
+    ),
+    livePresence: state.livePresence.map(p => 
+      (p.office === officeId) ? { ...p, officeName } : p // Handle both ID and Potential Label
+    )
+  })),
 
   clearStore: () => set({
     myAttendance: [],
