@@ -16,21 +16,22 @@ export default function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value;
   const isAuthenticated = !!token;
 
-  // Define patterns for public vs private routes
-  const isLoginPage = pathname.includes('/login');
-  const isDashboardPage = pathname.includes('/dashboard') || pathname.includes('/user/');
-  const isRootPage = pathname === '/' || locales.some(l => pathname === `/${l}`);
+  // Exact localized paths
+  const locale = locales.find(l => pathname === `/${l}` || pathname.startsWith(`/${l}/`)) || 'en';
+  
+  const isLoginPage = pathname === `/${locale}/login` || pathname === '/login';
+  const isDashboardPage = pathname.startsWith(`/${locale}/dashboard`) || pathname.startsWith(`/${locale}/user/`);
+  const isRootPage = pathname === '/' || pathname === `/${locale}`;
 
-  // 1. If trying to access dashboard/user/root routes without being logged in -> Redirect to login
-  if (!isAuthenticated && (isDashboardPage)) {
-    const locale = pathname.split('/')[1] || 'en';
+  // 1. If trying to access dashboard/user routes without being logged in -> Redirect to login
+  if (!isAuthenticated && isDashboardPage) {
     const loginUrl = new URL(`/${locale}/login`, request.url);
     return NextResponse.redirect(loginUrl);
   }
 
   // 2. If already logged in and trying to access login/root -> Redirect to dashboard
+  // Only redirect if definitively on the login page to avoid intercepting 404s or other routes
   if (isAuthenticated && (isLoginPage || isRootPage)) {
-    const locale = pathname.split('/')[1] || 'en';
     const dashboardUrl = new URL(`/${locale}/dashboard`, request.url);
     return NextResponse.redirect(dashboardUrl);
   }

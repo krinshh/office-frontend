@@ -97,10 +97,12 @@ export function GlobalConfigClient() {
   const isAdmin = hasPermission(PERMISSIONS.GLOBAL_CONFIG_MANAGE);
 
   useEffect(() => {
-    if (storeConfig) {
+    if (user && !isAdmin) {
+      router.replace('/dashboard');
+    } else if (storeConfig) {
       setFormData(prev => ({ ...prev, ...storeConfig }));
     }
-  }, [storeConfig]);
+  }, [user, isAdmin, router, storeConfig]);
 
   useEffect(() => {
     if (isAdmin) {
@@ -228,14 +230,9 @@ export function GlobalConfigClient() {
     }
   };
 
-  if (!isAdmin) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
-        <Shield className="w-12 h-12 text-destructive mb-4" />
-        <h1 className="text-2xl font-bold text-destructive mb-2">{t('globalConfig.accessDenied')}</h1>
-        <p className="text-muted-foreground">{t('common.accessRestrictedMessage')}</p>
-      </div>
-    );
+  // If user is logged in but not an admin, show nothing while redirecting
+  if (user && !isAdmin) {
+    return null;
   }
 
   return (

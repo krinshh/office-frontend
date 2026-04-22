@@ -3,7 +3,7 @@
 import React from 'react';
 import { useAuthStore } from '@/lib/store';
 import { useRouter } from '@/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Menu from 'lucide-react/dist/esm/icons/menu';
 import LogOut from 'lucide-react/dist/esm/icons/log-out';
 import User from 'lucide-react/dist/esm/icons/user';
@@ -24,6 +24,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = React.memo(({ onMenuClick, title }) => {
   const t = useTranslations();
+  const locale = useLocale();
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const { hasAnyPermission } = usePermissions();
@@ -44,21 +45,24 @@ const Header: React.FC<HeaderProps> = React.memo(({ onMenuClick, title }) => {
 
   const handleLogout = async () => {
     try {
-      // 1. Tell backend to clear the HttpOnly Cookie
+      // 1. Tell backend to clear session
       await api.auth.logout();
     } catch (err) {
       console.error('Logout API failed, forcing local cleanup');
     }
 
-    // 2. Clear persistent storage
+    // 2. Use centralized store logout (clears state and cookie)
+    logout();
+
+    // 3. Optional: Clear theme-preserving storage
     const theme = localStorage.getItem('theme');
     localStorage.clear();
     if (theme) localStorage.setItem('theme', theme);
     sessionStorage.clear();
 
-    // 3. Force a hard browser redirect to root
-    // The middleware will now see no token and correctly block access
-    window.location.replace('/login');
+    // 4. Localized redirect to login
+    // Using simple href with locale ensures a clean break from old contexts
+    window.location.href = `/${locale}/login`; 
   };
 
   return (

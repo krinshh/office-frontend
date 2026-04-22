@@ -74,7 +74,7 @@ export function AttendanceClient() {
 
   useEffect(() => {
     if (user && !isAdmin) {
-      router.push('/dashboard');
+      router.replace('/dashboard');
     } else if (user) {
       init();
     }
@@ -163,16 +163,9 @@ export function AttendanceClient() {
     }
   }, [filters.office, filters.userType, filteredUsers, viewMode, t, handleError]);
 
+  // If user is logged in but not an admin, show nothing while redirecting
   if (user && !isAdmin) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
-        <div className="bg-destructive/10 p-4 rounded-full mb-4">
-          <Shield className="w-12 h-12 text-destructive" />
-        </div>
-        <h1 className="text-2xl font-bold text-destructive mb-2">{t('common.accessRestricted')}</h1>
-        <p className="text-muted-foreground">{t('common.accessRestrictedMessage')}</p>
-      </div>
-    );
+    return null;
   }
 
   const officeOptions = offices.map(o => ({ value: o._id, label: o.name }));

@@ -146,8 +146,11 @@ export function UsersClient() {
   };
 
   useEffect(() => {
-    if (user && !isAdmin) router.push('/dashboard');
-    else if (user) fetchData();
+    if (user && !isAdmin) {
+      router.replace('/dashboard');
+    } else if (user) {
+      fetchData();
+    }
   }, [user, isAdmin, router]);
 
   const handleUserTypeSubmit = async (formData: { name: string; description: string; permissions: string[] }) => {
@@ -237,14 +240,9 @@ export function UsersClient() {
   const userTypeOptions = userTypes.map(t => ({ value: t._id, label: t.name }));
   const officeOptions = offices.map(o => ({ value: o._id, label: o.name }));
 
+  // If user is logged in but not an admin, show nothing while redirecting
   if (user && !isAdmin) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
-        <div className="bg-destructive/10 p-4 rounded-full mb-4"><Shield className="w-12 h-12 text-destructive" /></div>
-        <h1 className="text-2xl font-bold text-destructive mb-2">{t('common.accessRestricted')}</h1>
-        <p className="text-muted-foreground">{t('common.accessRestrictedMessage')}</p>
-      </div>
-    );
+    return null;
   }
 
   return (

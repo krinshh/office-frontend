@@ -21,6 +21,10 @@ import dynamic from 'next/dynamic';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { useAppStore } from '@/lib/appStore';
 import { VALID_REGEX } from '@/constants/regex';
+import { usePermissions } from '@/hooks/usePermissions';
+import { PERMISSIONS } from '@/constants/permissions';
+import { useRouter } from '@/navigation';
+import { useAuthStore } from '@/lib/store';
 
 const Modal = dynamic(() => import('@/components/Modal'), {
   ssr: false,
@@ -62,6 +66,11 @@ export function OfficesClient() {
     photo: null as File | null,
   });
 
+  const { hasPermission } = usePermissions();
+  const isAdmin = hasPermission(PERMISSIONS.OFFICES_MANAGE);
+  const router = useRouter();
+  const { user } = useAuthStore();
+
   // Data
   const { offices, fetchOffices: storeFetchOffices, lastFetched, removeOffice } = useAppStore();
   const {
@@ -87,8 +96,12 @@ export function OfficesClient() {
   };
 
   useEffect(() => {
-    fetchOfficesData();
-  }, [offices.length, lastFetched.offices]);
+    if (user && !isAdmin) {
+      router.replace('/dashboard');
+    } else if (user) {
+      fetchOfficesData();
+    }
+  }, [user, isAdmin, router, offices.length, lastFetched.offices]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -287,6 +300,11 @@ export function OfficesClient() {
     clearErrors();
     setFormData(prev => ({ ...prev, photo: file }));
   };
+
+  // If user is logged in but not an admin, show nothing while redirecting
+  if (user && !isAdmin) {
+    return null;
+  }
 
   return (
     <>

@@ -34,9 +34,14 @@ export function AuditClient() {
 
   useEffect(() => {
     if (user && !isAdmin) {
-      router.push('/dashboard');
+      router.replace('/dashboard');
     }
   }, [user, isAdmin, router]);
+
+  // If user is logged in but not an admin, show nothing while redirecting
+  if (user && !isAdmin) {
+    return null;
+  }
 
   // Filters
   const [filters, setFilters] = useState({
@@ -105,17 +110,6 @@ export function AuditClient() {
     setFilters(prev => ({ ...prev, page }));
   };
 
-  if (!isAdmin) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
-        <div className="bg-destructive/10 p-4 rounded-full mb-4 md:bg-destructive/50 text-destructive">
-          <Shield className="w-12 h-12" />
-        </div>
-        <h1 className="text-2xl font-bold text-destructive mb-2">{t('audit.accessDenied')}</h1>
-        <p className="text-muted-foreground">{t('common.accessRestrictedMessage')}</p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4 md:space-y-6 lg:space-y-8">

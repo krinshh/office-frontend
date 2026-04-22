@@ -11,6 +11,7 @@ import { useAppStore } from '@/lib/appStore';
 import { useTaskStore } from '@/lib/taskStore';
 import { useSalaryStore } from '@/lib/salaryStore';
 import { useAttendanceStore } from '@/lib/attendanceStore';
+import { useRouter } from '@/navigation';
 import { api } from '@/lib/api';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -23,6 +24,7 @@ import { formatDateIST } from '@/utils/dateUtils';
 
 export function ReportsClient() {
   const t = useTranslations('reports');
+  const router = useRouter();
   const { user } = useAuthStore();
   const { offices, userTypes, users, fetchOffices, fetchUserTypes, fetchUsers } = useAppStore();
   const {
@@ -91,11 +93,13 @@ export function ReportsClient() {
 
   const hasFetched = useRef(false);
   useEffect(() => {
-    if (user && canViewReports && !hasFetched.current) {
+    if (user && !canViewReports) {
+      router.replace('/dashboard');
+    } else if (user && canViewReports && !hasFetched.current) {
       hasFetched.current = true;
       fetchAllData();
     }
-  }, [user, canViewReports, fetchAllData]);
+  }, [user, canViewReports, fetchAllData, router]);
 
   useEffect(() => {
     if (loading) return;
@@ -129,16 +133,9 @@ export function ReportsClient() {
     }
   };
 
-  if (!canViewReports) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
-        <div className="bg-destructive/10 p-4 rounded-full mb-4 md:bg-destructive/50">
-          <Shield className="w-12 h-12 text-destructive" />
-        </div>
-        <h1 className="text-2xl font-bold text-destructive mb-2">{t('errors.accessRestricted')}</h1>
-        <p className="text-muted-foreground">{t('errors.accessRestrictedMessage')}</p>
-      </div>
-    );
+  // If user is logged in but not an admin, show nothing while redirecting
+  if (user && !canViewReports) {
+    return null;
   }
 
   return (
