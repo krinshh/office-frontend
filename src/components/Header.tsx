@@ -62,7 +62,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ onMenuClick, title }) => {
 
     // 4. Localized redirect to login
     // Using simple href with locale ensures a clean break from old contexts
-    window.location.href = `/${locale}/login`; 
+    window.location.href = `/${locale}/login`;
   };
 
   return (
@@ -101,24 +101,24 @@ const Header: React.FC<HeaderProps> = React.memo(({ onMenuClick, title }) => {
             <LanguageSwitcher variant={isManagement ? 'primary' : 'secondary'} />
           </div>
 
-          <div 
+          <div
             className="hidden md:flex items-center gap-2 text-sm h-9 cursor-pointer group/profile"
             onClick={() => router.push('/user/profile')}
           >
             <div className="flex items-center gap-2">
-            <div className={`w-9 h-9 ${accentBg} rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 shadow-sm border border-border group-hover/profile:border-primary/50 group-hover/profile:shadow-md`}>
-              {user?.photo ? (
-                <img
-                  src={getPhotoUrl(user.photo, user.updatedAt)}
-                  alt={user?.name || 'User'}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover/profile:scale-110"
-                />
-              ) : (
-                <User className={`w-5 h-5 ${accentColor} transition-colors duration-300 group-hover/profile:scale-110`} />
-              )}
-            </div>
+              <div className={`w-9 h-9 ${accentBg} rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 shadow-sm border border-border group-hover/profile:border-primary/50 group-hover/profile:shadow-md`}>
+                {user?.photo ? (
+                  <img
+                    src={getPhotoUrl(user.photo, user.updatedAt)}
+                    alt={user?.name || 'User'}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover/profile:scale-110"
+                  />
+                ) : (
+                  <User className={`w-5 h-5 ${accentColor} transition-colors duration-300 group-hover/profile:scale-110`} />
+                )}
+              </div>
               <div className="hidden lg:block">
-                <p className="font-medium text-foreground group-hover/profile:text-primary transition-colors">
+                <p className={`font-medium text-foreground ${isManagement ? 'group-hover/profile:text-primary' : 'group-hover/profile:text-secondary'} transition-colors`}>
                   {user?.name || 'User'}
                 </p>
                 <p className="text-muted-foreground text-xs">

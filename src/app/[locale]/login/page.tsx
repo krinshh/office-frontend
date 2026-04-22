@@ -1,21 +1,32 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Button from '@/components/Button';
+import dynamic from 'next/dynamic';
 import Alert from '@/components/Alert';
-import Input from '@/components/Input';
-import { ImagePreview } from '@/components/ImagePreview';
-import Card from '@/components/Card';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+import Image from '@/components/Image';
 import ThemeToggle from '@/components/ThemeToggle';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useAuthStore } from '@/lib/store';
 import { useRouter } from '@/navigation';
 import { useTranslations } from 'next-intl';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { api } from '@/lib/api';
-import Shield from 'lucide-react/dist/esm/icons/shield';
 import Lock from 'lucide-react/dist/esm/icons/lock';
 import Mail from 'lucide-react/dist/esm/icons/mail';
+
+// Dynamically import heavy or secondary components for performance optimization
+const VisualImpact = dynamic(() => import('./VisualImpact').then(mod => mod.VisualImpact), {
+  ssr: true,
+  loading: () => <div className="hidden lg:flex w-full lg:w-1/2 h-full bg-slate-900 animate-pulse" />
+});
+
+const PasswordLoginForm = dynamic(() => import('./PasswordLoginForm').then(mod => mod.PasswordLoginForm), {
+  ssr: true
+});
+
+const OTPLoginForm = dynamic(() => import('./OTPLoginForm').then(mod => mod.OTPLoginForm), {
+  ssr: true
+});
 
 export default function LoginPage() {
   const t = useTranslations();
@@ -38,7 +49,7 @@ export default function LoginPage() {
       setUsername(savedUsername);
       setRememberMe(true);
     }
-    // Pre-fetch CSRF token cookie
+    // Pre-fetch CSRF token cookie session
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' }).catch(() => { });
   }, []);
 
@@ -58,8 +69,7 @@ export default function LoginPage() {
       }
     };
     autoLogout();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isAuthenticated, logout]);
 
   const handleSendOTP = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -73,12 +83,12 @@ export default function LoginPage() {
     }
 
     try {
-      // Ensure CSRF cookie exists
-      const csrfCookie = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
-      if (!csrfCookie) {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' });
-      }
-      const csrfToken = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)?.[1] ?? '';
+       // Ensure CSRF cookie exists
+       const csrfCookie = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
+       if (!csrfCookie) {
+         await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' });
+       }
+       const csrfToken = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)?.[1] ?? '';
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/send-otp`, {
         method: 'POST',
@@ -209,218 +219,116 @@ export default function LoginPage() {
   };
 
   return (
-    <main>
-      <div className="w-full h-screen flex flex-col lg:flex-row overflow-hidden bg-background">
-        {/* Left Panel: Visual Impact (Hidden on Mobile/Tablets below 1024px) */}
-        <div className="hidden lg:flex w-full lg:w-1/2 h-full bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex-col items-center justify-center p-8 relative overflow-hidden">
-          <div className="absolute inset-0 z-10 bg-gradient-to-tr from-blue-900 to-transparent" />
-          <img
-            src="/login-bg.webp"
-            alt="Modern Office"
-            className="absolute inset-0 w-full h-full object-cover scale-105 animate-pulse-slow"
-            style={{ animationDuration: '8s' }}
-          />
-          <div className="relative z-20 flex flex-col justify-end p-10 w-full h-full text-white">
-            <div className="mb-4 xl:mb-8 inline-flex items-center gap-3 px-4 py-2 backdrop-blur-md bg-white/10 rounded-full border border-white/20 self-start animate-fade-in-up">
-              <Shield className="w-4 h-4 xl:w-5 xl:h-5 text-white" />
-              <span className="text-[10px] xl:text-sm font-bold tracking-wider uppercase">Enterprise Grade Security</span>
-            </div>
-            <div className="max-w-2xl animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-              <h1 className="text-4xl xl:text-7xl lg:text-5xl font-black mb-4 xl:mb-8 leading-[1.1] tracking-tighter drop-shadow-2xl">
-                Office Management <br />
-                <span className="text-white underline decoration-white/30 underline-offset-8">Simplified.</span>
-              </h1>
-              <p className="text-lg xl:text-2xl text-white font-medium leading-relaxed">
-                Manage your teams, synchronize attendance, and automate payroll with absolute precision.
-              </p>
-            </div>
-          </div>
+    <main className="w-full h-screen flex flex-col lg:flex-row overflow-hidden bg-background">
+      {/* Left Panel: Visual Impact (Desktop Only via dynamic split) */}
+      <VisualImpact />
+
+      {/* Right Panel: Content */}
+      <div className="w-full lg:w-1/2 min-h-screen overflow-y-auto relative bg-background">
+        {/* Soft-Illumination Gradient */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-0 left-1/4 w-full h-[60%] bg-[radial-gradient(ellipse_at_top,_hsl(var(--primary)/0.15),transparent_70%)] opacity-70" />
+          <div className="absolute bottom-0 right-1/4 w-full h-[60%] bg-[radial-gradient(ellipse_at_bottom,_hsl(var(--secondary)/0.1),transparent_70%)] opacity-50" />
         </div>
 
-        {/* Right Panel: Content */}
-        <div className="w-full lg:w-1/2 min-h-screen overflow-y-auto relative bg-background">
-          {/* Soft-Illumination Gradient (Synced with Dashboard Colors) */}
-          <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-            <div className="absolute top-0 left-1/4 w-full h-[60%] bg-[radial-gradient(ellipse_at_top,_hsl(var(--primary)/0.15),transparent_70%)] opacity-70" />
-            <div className="absolute bottom-0 right-1/4 w-full h-[60%] bg-[radial-gradient(ellipse_at_bottom,_hsl(var(--secondary)/0.1),transparent_70%)] opacity-50" />
-          </div>
+        <div className="min-h-full w-full flex flex-col items-center justify-center px-6 md:px-20 lg:px-10 xl:px-[5.5vw] relative z-10">
+          <div className="w-full">
+            <div className="lg:hidden flex justify-end mb-6 gap-2 [&_span]:!inline relative z-20">
+              <ThemeToggle />
+              <LanguageSwitcher variant="primary" />
+            </div>
 
-          <div className="min-h-full w-full flex flex-col items-center justify-center px-6 md:px-20 lg:px-10 xl:px-[5.5vw] relative z-10">
-            <div className="w-full">
-              <div className="lg:hidden flex justify-end mb-6 gap-2 [&_span]:!inline relative z-20">
-                <ThemeToggle />
-                <LanguageSwitcher variant="primary" />
-              </div>
-
-              <div className="bg-card/80 lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-none border lg:border-none border-border/50 shadow-xl lg:shadow-none rounded-[20px] lg:rounded-none p-6 md:p-8 lg:p-0">
-                {/* <div className="mb-10 text-center lg:text-left">
-              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center shadow-xl shadow-primary/20 mb-6 mx-auto lg:mx-0">
-                  <Lock className="text-white w-7 h-7" />
-                </div>
-              <h2 className="text-3xl font-bold text-foreground tracking-tight mb-2">
-                {t('auth.login.welcomeTitle')}
-              </h2>
-              <p className="text-muted-foreground">
-                {t('auth.login.welcomeSubtitle')}
-              </p>
-            </div> */}
-                <div className="flex justify-center items-center mb-10 xl:mb-20">
-                  <ImagePreview
-                    src={`/Frame 11.png`}
+            <div className="bg-card/80 lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-none border lg:border-none border-border/50 shadow-xl lg:shadow-none rounded-[20px] lg:rounded-none p-6 md:p-8 lg:p-0">
+              <div className="flex justify-center items-center mb-10 xl:mb-20">
+                <div className="group cursor-pointer">
+                  <Image
+                    src="/Frame 11.png"
                     alt="Logo"
-                    className="w-60 md:w-70 lg:w-80 h-auto shrink-0 transition-all duration-500 group-hover:brightness-110"
-                    thumbnailClassName="w-full h-auto object-contain drop-shadow-sm"
+                    width={320}
+                    height={80}
+                    priority
+                    className="w-60 md:w-70 lg:w-80 h-auto shrink-0 transition-all duration-500 group-hover:brightness-110 drop-shadow-sm"
                   />
                 </div>
-                {/* <div className="logo-placeholder">
-                E
-              </div> */}
-                <div className="flex justify-between items-center">
-                  <div className="flex justify-start items-start flex-col mb-4 xl:mb-6">
-                    <h1 className="text-2xl font-bold text-foreground overflow-hidden text-ellipsis leading-none pb-1 capitalize">
-                      {t('auth.login.welcomeTitle')}</h1>
-                    <p className="text-muted-foreground overflow-hidden text-ellipsis leading-none pb-1">
-                      {t('auth.login.welcomeSubtitle')}</p>
-                  </div>
-
-                  <div className="hidden lg:flex justify-end gap-2 [&_span]:!inline relative z-20">
-                    <ThemeToggle />
-                    <LanguageSwitcher variant="primary" />
-                  </div>
-                </div>
-
-                {/* Login Methods Tabs */}
-                <div className="inline-flex mb-4 xl:mb-6 w-full border-b-2 border-b-border">
-                  <button
-                    onClick={() => { setLoginMethod('password'); clearErrors(); }}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold transition-all duration-200 ${loginMethod === 'password' ? 'text-primary border-b-2 border-b-primary' : 'text-foreground'}`}
-                  >
-                    <Lock className="w-4 h-4" />
-                    {t('auth.login.methods.password')}
-                  </button>
-                  <button
-                    onClick={() => { setLoginMethod('otp'); clearErrors(); }}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold transition-all duration-200 ${loginMethod === 'otp' ? 'text-primary border-b-2 border-b-primary' : 'text-foreground'}`}
-                  >
-                    <Mail className="w-4 h-4" />
-                    {t('auth.login.methods.otp')}
-                  </button>
-                </div>
-
-                {errors.general && <Alert type="error" message={errors.general} className="mb-6 animate-fade-in" />}
-                {success && <Alert type="success" message={success} className="mb-6 animate-fade-in" />}
-
-                {loginMethod === 'otp' ? (
-                  <div className="space-y-4 xl:space-y-6 mb-4 xl:mb-6">
-                    {step === 'credentials' ? (
-                      <form onSubmit={handleSendOTP} className="space-y-4 xl:space-y-6">
-                        <Input
-                          label={t('auth.login.inputs.email')}
-                          type="email"
-                          name="email"
-                          autoComplete="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="name@company.com"
-                          error={errors.email}
-                          required
-                          fullWidth
-                        />
-                        <Button type="submit" disabled={loading} className="w-full h-12 text-md font-bold" size="lg">
-                          {loading ? t('auth.login.buttons.sendingOtp') : t('auth.login.buttons.sendOtp')}
-                        </Button>
-                      </form>
-                    ) : (
-                      <form onSubmit={handleVerifyOTP} className="space-y-4 xl:space-y-6 text-center">
-                        <div className="bg-muted/50 p-4 rounded-xl border border-border/50 mb-2">
-                          <p className="text-sm text-muted-foreground mb-1">{t('auth.login.otpStep.sentMessage')}</p>
-                          <p className="font-bold text-foreground">{email}</p>
-                        </div>
-                        <Input
-                          label={t('auth.login.otpStep.verifyLabel')}
-                          type="text"
-                          autoComplete="one-time-code"
-                          maxLength={6}
-                          value={otp}
-                          onChange={(e) => setOtp(e.target.value)}
-                          placeholder={t('auth.login.inputs.otpPlaceholder')}
-                          className="text-center text-3xl font-mono tracking-widest h-14"
-                          error={errors.otp}
-                          required
-                        />
-                        <Button type="submit" disabled={loading} className="w-full h-12" size="lg">
-                          {loading ? t('auth.login.buttons.verifying') : t('auth.login.buttons.verify')}
-                        </Button>
-                        <button type="button" onClick={() => setStep('credentials')} className="text-sm font-medium text-primary hover:underline">
-                          {t('auth.login.buttons.changeEmail')}
-                        </button>
-                      </form>
-                    )}
-                  </div>
-                ) : (
-                  <form onSubmit={handlePasswordLogin} className="space-y-4 xl:space-y-6 mb-4 xl:mb-6">
-                    <Input
-                      label={t('auth.login.inputs.username')}
-                      type="text"
-                      name="username"
-                      autoComplete="username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder={t('auth.login.inputs.usernamePlaceholder')}
-                      error={errors.username}
-                      required
-                      fullWidth
-                    />
-                    <div className="space-y-1">
-                      <Input
-                        id="password-login"
-                        type="password"
-                        label={t('auth.login.inputs.password')}
-                        name="password"
-                        autoComplete="current-password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                        error={errors.password}
-                        required
-                        fullWidth
-                      />
-                      <button type="button" onClick={() => router.push('/forgot-password')} className="text-primary text-sm font-bold hover:underline">
-                        {t('auth.login.forgotPassword')}
-                      </button>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <input
-                        type="checkbox"
-                        id="rememberMe"
-                        autoComplete="off"
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                        className="rounded-xl border-input text-primary focus:ring-primary h-auto w-auto"
-                      />
-                      <label htmlFor="rememberMe" className="text-sm font-medium text-muted-foreground cursor-pointer">
-                        {t('auth.login.rememberMe')}
-                      </label>
-                    </div>
-                    <Button type="submit" disabled={loading} className="w-full h-12 text-md font-bold" size="lg">
-                      {loading ? t('auth.login.buttons.verifying') : t('auth.login.buttons.verify')}
-                    </Button>
-                  </form>
-                )}
-
-                <p className="text-xs text-muted-foreground sm:leading-none">
-                  {t.rich('auth.login.termsAndPrivacy', {
-                    terms: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>,
-                    privacy: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>
-                  })}
-                </p>
-                {/* 
-                <div className="mt-12">
-                  <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">
-                    © 2026 Office Management System
-                  </p>
-                </div> */}
               </div>
+
+              <div className="flex justify-between items-center">
+                <div className="flex justify-start items-start flex-col mb-4 xl:mb-6">
+                  <h1 className="text-2xl font-bold text-foreground overflow-hidden text-ellipsis leading-none pb-1 capitalize">
+                    {t('auth.login.welcomeTitle')}
+                  </h1>
+                  <p className="text-muted-foreground overflow-hidden text-ellipsis leading-none pb-1">
+                    {t('auth.login.welcomeSubtitle')}
+                  </p>
+                </div>
+
+                <div className="hidden lg:flex justify-end gap-2 [&_span]:!inline relative z-20">
+                  <ThemeToggle />
+                  <LanguageSwitcher variant="primary" />
+                </div>
+              </div>
+
+              {/* Login Methods Tabs */}
+              <div className="inline-flex mb-4 xl:mb-6 w-full border-b-2 border-b-border">
+                <button
+                  onClick={() => { setLoginMethod('password'); clearErrors(); }}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold transition-all duration-200 ${loginMethod === 'password' ? 'text-primary border-b-2 border-b-primary' : 'text-foreground'}`}
+                >
+                  <Lock className="w-4 h-4" />
+                  {t('auth.login.methods.password')}
+                </button>
+                <button
+                  onClick={() => { setLoginMethod('otp'); clearErrors(); }}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold transition-all duration-200 ${loginMethod === 'otp' ? 'text-primary border-b-2 border-b-primary' : 'text-foreground'}`}
+                >
+                  <Mail className="w-4 h-4" />
+                  {t('auth.login.methods.otp')}
+                </button>
+              </div>
+
+              {errors.general && <Alert type="error" message={errors.general} className="mb-6 animate-fade-in" />}
+              {success && <Alert type="success" message={success} className="mb-6 animate-fade-in" />}
+
+              {loginMethod === 'password' ? (
+                <PasswordLoginForm
+                  username={username}
+                  setUsername={setUsername}
+                  password={password}
+                  setPassword={setPassword}
+                  rememberMe={rememberMe}
+                  setRememberMe={setRememberMe}
+                  loading={loading}
+                  errors={errors}
+                  onSubmit={handlePasswordLogin}
+                  onForgotPassword={() => router.push('/forgot-password')}
+                />
+              ) : (
+                <OTPLoginForm
+                  step={step}
+                  email={email}
+                  setEmail={setEmail}
+                  otp={otp}
+                  setOtp={setOtp}
+                  loading={loading}
+                  errors={errors}
+                  onSendOTP={handleSendOTP}
+                  onVerifyOTP={handleVerifyOTP}
+                  onChangeEmail={() => setStep('credentials')}
+                />
+              )}
+
+              <p className="text-xs text-muted-foreground sm:leading-none mt-4">
+                {t.rich('auth.login.termsAndPrivacy', {
+                  terms: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>,
+                  privacy: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>
+                })}
+              </p>
+              {/* 
+              <div className="mt-12">
+                <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">
+                  © 2026 Office Management System
+                </p>
+              </div> */}
             </div>
           </div>
         </div>
