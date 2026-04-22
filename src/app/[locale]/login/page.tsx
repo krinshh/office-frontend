@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Alert from '@/components/Alert';
-import NextImage from 'next/image';
+import Image from '@/components/Image';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useAuthStore } from '@/lib/store';
@@ -83,12 +83,12 @@ export default function LoginPage() {
     }
 
     try {
-      // Ensure CSRF cookie exists
-      const csrfCookie = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
-      if (!csrfCookie) {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' });
-      }
-      const csrfToken = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)?.[1] ?? '';
+       // Ensure CSRF cookie exists
+       const csrfCookie = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
+       if (!csrfCookie) {
+         await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' });
+       }
+       const csrfToken = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)?.[1] ?? '';
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/send-otp`, {
         method: 'POST',
@@ -241,7 +241,7 @@ export default function LoginPage() {
             <div className="bg-card/80 lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-none border lg:border-none border-border/50 shadow-xl lg:shadow-none rounded-[20px] lg:rounded-none p-6 md:p-8 lg:p-0">
               <div className="flex justify-center items-center mb-10 xl:mb-20">
                 <div className="group cursor-pointer">
-                  <NextImage
+                  <Image
                     src="/Frame 11.png"
                     alt="Logo"
                     width={320}
@@ -261,7 +261,6 @@ export default function LoginPage() {
                     {t('auth.login.welcomeSubtitle')}
                   </p>
                 </div>
-
 
                 <div className="hidden lg:flex justify-end gap-2 [&_span]:!inline relative z-20">
                   <ThemeToggle />
@@ -324,6 +323,12 @@ export default function LoginPage() {
                   privacy: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>
                 })}
               </p>
+              {/* 
+              <div className="mt-12">
+                <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">
+                  © 2026 Office Management System
+                </p>
+              </div> */}
             </div>
           </div>
         </div>
