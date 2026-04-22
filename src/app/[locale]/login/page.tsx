@@ -83,12 +83,12 @@ export default function LoginPage() {
     }
 
     try {
-       // Ensure CSRF cookie exists
-       const csrfCookie = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
-       if (!csrfCookie) {
-         await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' });
-       }
-       const csrfToken = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)?.[1] ?? '';
+      // Ensure CSRF cookie exists
+      const csrfCookie = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
+      if (!csrfCookie) {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' });
+      }
+      const csrfToken = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)?.[1] ?? '';
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/send-otp`, {
         method: 'POST',
@@ -262,6 +262,7 @@ export default function LoginPage() {
                   </p>
                 </div>
 
+
                 <div className="hidden lg:flex justify-end gap-2 [&_span]:!inline relative z-20">
                   <ThemeToggle />
                   <LanguageSwitcher variant="primary" />
@@ -323,12 +324,6 @@ export default function LoginPage() {
                   privacy: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>
                 })}
               </p>
-              {/* 
-              <div className="mt-12">
-                <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">
-                  © 2026 Office Management System
-                </p>
-              </div> */}
             </div>
           </div>
         </div>
