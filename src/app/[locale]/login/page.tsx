@@ -17,7 +17,7 @@ import Mail from 'lucide-react/dist/esm/icons/mail';
 
 // Dynamically import heavy or secondary components for performance optimization
 const VisualImpact = dynamic(() => import('./VisualImpact').then(mod => mod.VisualImpact), {
-  ssr: false,
+  ssr: true,
   loading: () => <div className="hidden lg:flex w-full lg:w-1/2 h-full bg-slate-900 animate-pulse" />
 });
 

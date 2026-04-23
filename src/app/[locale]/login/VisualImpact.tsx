@@ -1,24 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import NextImage from 'next/image';
 import Shield from 'lucide-react/dist/esm/icons/shield';
 
 export function VisualImpact() {
-  const [isMobile, setIsMobile] = useState(true);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // On mobile, we return null to completely skip rendering heavy visual logic
-  if (isMobile) return null;
-
   return (
     <div className="hidden lg:flex w-full lg:w-1/2 h-full bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex-col items-center justify-center p-8 relative overflow-hidden">
       <div className="absolute inset-0 z-10 bg-gradient-to-tr from-blue-900 to-transparent" />
