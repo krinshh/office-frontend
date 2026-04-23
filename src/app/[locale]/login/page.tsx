@@ -265,8 +265,11 @@ export default function LoginPage() {
 
   return (
     <main className="w-full h-screen flex flex-col lg:flex-row overflow-hidden bg-background">
-      {/* Left Panel: Optimized via Dynamic Import & Conditional Rendering */}
-      {isDesktop && <VisualImpact />}
+      {/* Left Panel: Optimized via Dynamic Import & Conditional Hydration. 
+          The wrapper div prevents CLS by reserving space on 'lg' screens. */}
+      <div className="hidden lg:flex w-full lg:w-1/2 h-screen bg-slate-900">
+        {isDesktop && <VisualImpact />}
+      </div>
 
       {/* Right Panel: Content */}
       <div className="w-full lg:w-1/2 min-h-screen overflow-y-auto relative bg-background">
