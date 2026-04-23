@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
+import NextImage from 'next/image';
 import Alert from '@/components/Alert';
 import Image from '@/components/Image';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -14,10 +15,10 @@ import { api } from '@/lib/api';
 import Lock from 'lucide-react/dist/esm/icons/lock';
 import Mail from 'lucide-react/dist/esm/icons/mail';
 
-// Dynamically import heavy or secondary components for performance optimization
+// Dynamically import components to break up the initial JS payload
 const VisualImpact = dynamic(() => import('./VisualImpact').then(mod => mod.VisualImpact), {
   ssr: true,
-  loading: () => <div className="hidden lg:flex w-full lg:w-1/2 h-full bg-slate-900 animate-pulse" />
+  loading: () => <div className="hidden lg:flex w-full lg:w-1/2 h-full bg-slate-900" />
 });
 
 const PasswordLoginForm = dynamic(() => import('./PasswordLoginForm').then(mod => mod.PasswordLoginForm), {
@@ -41,37 +42,55 @@ export default function LoginPage() {
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'credentials' | 'otp'>('credentials');
   const [rememberMe, setRememberMe] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Load remembered username
   useEffect(() => {
-    const savedUsername = localStorage.getItem('rememberedUsername');
-    if (savedUsername) {
-      setUsername(savedUsername);
-      setRememberMe(true);
-    }
-    // Pre-fetch CSRF token cookie session
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' }).catch(() => { });
+    setMounted(true);
   }, []);
 
-  // Auto-logout if visiting login page while authenticated
+  // Performance Optimization: Defer non-critical initializations
   useEffect(() => {
-    const autoLogout = async () => {
-      if (isAuthenticated) {
-        try {
-          await api.auth.logout();
-        } catch (e) { }
-
-        const theme = localStorage.getItem('theme');
-        localStorage.clear();
-        if (theme) localStorage.setItem('theme', theme);
-        sessionStorage.clear();
-        logout(); // Zustand state cleanup
+    const deferInitialization = () => {
+      // Load remembered username
+      const savedUsername = localStorage.getItem('rememberedUsername');
+      if (savedUsername) {
+        setUsername(savedUsername);
+        setRememberMe(true);
       }
+      
+      // Pre-fetch CSRF token session (low priority)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' }).catch(() => { });
     };
-    autoLogout();
+
+    // Use requestIdleCallback if available, fallback to setTimeout
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(deferInitialization);
+    } else {
+      setTimeout(deferInitialization, 1);
+    }
+  }, []);
+
+  // Performance Optimization: Defer auth check to prevent hydration blocking
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const performAutoLogout = async () => {
+      try {
+        await api.auth.logout();
+      } catch (e) { }
+
+      const theme = localStorage.getItem('theme');
+      localStorage.clear();
+      if (theme) localStorage.setItem('theme', theme);
+      sessionStorage.clear();
+      logout();
+    };
+
+    const timer = setTimeout(performAutoLogout, 0);
+    return () => clearTimeout(timer);
   }, [isAuthenticated, logout]);
 
-  const handleSendOTP = async (e?: React.FormEvent) => {
+  const handleSendOTP = useCallback(async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     clearErrors();
     setIsLoading(true);
@@ -83,7 +102,6 @@ export default function LoginPage() {
     }
 
     try {
-       // Ensure CSRF cookie exists
        const csrfCookie = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
        if (!csrfCookie) {
          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' });
@@ -112,9 +130,9 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [email, clearErrors, setIsLoading, handleError, handleSuccess, t]);
 
-  const handleVerifyOTP = async (e?: React.FormEvent) => {
+  const handleVerifyOTP = useCallback(async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     clearErrors();
     setIsLoading(true);
@@ -159,9 +177,9 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [email, otp, clearErrors, setIsLoading, handleError, login, router, t]);
 
-  const handlePasswordLogin = async (e?: React.FormEvent) => {
+  const handlePasswordLogin = useCallback(async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     clearErrors();
     setIsLoading(true);
@@ -216,16 +234,25 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [username, password, rememberMe, clearErrors, setIsLoading, handleError, login, router, t]);
+
+  // Memoize terms and privacy block to prevent re-parsing during hydration
+  const TermsBlock = useMemo(() => (
+    <p className="text-xs text-muted-foreground sm:leading-none mt-4">
+      {t.rich('auth.login.termsAndPrivacy', {
+        terms: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>,
+        privacy: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>
+      })}
+    </p>
+  ), [t]);
 
   return (
-    <main className="w-full h-screen flex flex-col lg:flex-row overflow-hidden bg-background">
-      {/* Left Panel: Visual Impact (Desktop Only via dynamic split) */}
+    <main className={`w-full h-screen flex flex-col lg:flex-row overflow-hidden bg-background transition-opacity duration-300 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+      {/* Left Panel: Optimized via Dynamic Import & Memoization */}
       <VisualImpact />
 
       {/* Right Panel: Content */}
       <div className="w-full lg:w-1/2 min-h-screen overflow-y-auto relative bg-background">
-        {/* Soft-Illumination Gradient */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <div className="absolute top-0 left-1/4 w-full h-[60%] bg-[radial-gradient(ellipse_at_top,_hsl(var(--primary)/0.15),transparent_70%)] opacity-70" />
           <div className="absolute bottom-0 right-1/4 w-full h-[60%] bg-[radial-gradient(ellipse_at_bottom,_hsl(var(--secondary)/0.1),transparent_70%)] opacity-50" />
@@ -241,7 +268,7 @@ export default function LoginPage() {
             <div className="bg-card/80 lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-none border lg:border-none border-border/50 shadow-xl lg:shadow-none rounded-[20px] lg:rounded-none p-6 md:p-8 lg:p-0">
               <div className="flex justify-center items-center mb-10 xl:mb-20">
                 <div className="group cursor-pointer">
-                  <Image
+                  <NextImage
                     src="/Frame 11.png"
                     alt="Logo"
                     width={320}
@@ -317,12 +344,7 @@ export default function LoginPage() {
                 />
               )}
 
-              <p className="text-xs text-muted-foreground sm:leading-none mt-4">
-                {t.rich('auth.login.termsAndPrivacy', {
-                  terms: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>,
-                  privacy: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>
-                })}
-              </p>
+              {TermsBlock}
               {/* 
               <div className="mt-12">
                 <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">

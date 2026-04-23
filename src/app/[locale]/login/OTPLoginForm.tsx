@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import { useTranslations } from 'next-intl';
@@ -18,7 +18,7 @@ interface OTPLoginFormProps {
   onChangeEmail: () => void;
 }
 
-export function OTPLoginForm({
+export const OTPLoginForm = memo(({
   step,
   email,
   setEmail,
@@ -29,7 +29,7 @@ export function OTPLoginForm({
   onSendOTP,
   onVerifyOTP,
   onChangeEmail
-}: OTPLoginFormProps) {
+}: OTPLoginFormProps) => {
   const t = useTranslations();
 
   if (step === 'credentials') {
@@ -80,4 +80,6 @@ export function OTPLoginForm({
       </button>
     </form>
   );
-}
+});
+
+OTPLoginForm.displayName = 'OTPLoginForm';

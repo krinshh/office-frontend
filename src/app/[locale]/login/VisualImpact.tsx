@@ -1,18 +1,22 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import Shield from 'lucide-react/dist/esm/icons/shield';
+import Image from '@/components/Image';
 
-export function VisualImpact() {
+export const VisualImpact = memo(() => {
   return (
     <div className="hidden lg:flex w-full lg:w-1/2 h-full bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex-col items-center justify-center p-8 relative overflow-hidden">
       <div className="absolute inset-0 z-10 bg-gradient-to-tr from-blue-900 to-transparent" />
-      <img
-        src="/login-bg.webp"
-        alt="Modern Office"
-        className="absolute inset-0 w-full h-full object-cover scale-105 animate-pulse-slow"
-        style={{ animationDuration: '8s' }}
-      />
+      <div className="absolute inset-0 w-full h-full scale-105 animate-pulse-slow pointer-events-none" style={{ animationDuration: '8s' }}>
+        <Image
+          src="/login-bg.webp"
+          alt="Modern Office"
+          fill
+          priority
+          className="object-cover"
+        />
+      </div>
       <div className="relative z-20 flex flex-col justify-end p-10 w-full h-full text-white">
         <div className="mb-4 xl:mb-8 inline-flex items-center gap-3 px-4 py-2 backdrop-blur-md bg-white/10 rounded-full border border-white/20 self-start animate-fade-in-up">
           <Shield className="w-4 h-4 xl:w-5 xl:h-5 text-white" />
@@ -30,4 +34,6 @@ export function VisualImpact() {
       </div>
     </div>
   );
-}
+});
+
+VisualImpact.displayName = 'VisualImpact';

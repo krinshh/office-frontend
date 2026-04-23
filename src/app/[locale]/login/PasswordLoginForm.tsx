@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import { useTranslations } from 'next-intl';
@@ -18,7 +18,7 @@ interface PasswordLoginFormProps {
   onForgotPassword: () => void;
 }
 
-export function PasswordLoginForm({
+export const PasswordLoginForm = memo(({
   username,
   setUsername,
   password,
@@ -29,7 +29,7 @@ export function PasswordLoginForm({
   errors,
   onSubmit,
   onForgotPassword
-}: PasswordLoginFormProps) {
+}: PasswordLoginFormProps) => {
   const t = useTranslations();
 
   return (
@@ -86,4 +86,6 @@ export function PasswordLoginForm({
       </Button>
     </form>
   );
-}
+});
+
+PasswordLoginForm.displayName = 'PasswordLoginForm';
