@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import NextImage from 'next/image';
 import Alert from '@/components/Alert';
 import Image from '@/components/Image';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -16,7 +17,7 @@ import Mail from 'lucide-react/dist/esm/icons/mail';
 
 // Dynamically import heavy or secondary components for performance optimization
 const VisualImpact = dynamic(() => import('./VisualImpact').then(mod => mod.VisualImpact), {
-  ssr: true,
+  ssr: false,
   loading: () => <div className="hidden lg:flex w-full lg:w-1/2 h-full bg-slate-900 animate-pulse" />
 });
 
@@ -241,12 +242,13 @@ export default function LoginPage() {
             <div className="bg-card/80 lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-none border lg:border-none border-border/50 shadow-xl lg:shadow-none rounded-[20px] lg:rounded-none p-6 md:p-8 lg:p-0">
               <div className="flex justify-center items-center mb-10 xl:mb-20">
                 <div className="group cursor-pointer">
-                  <Image
+                  <NextImage
                     src="/Frame 11.png"
                     alt="Logo"
                     width={320}
                     height={80}
                     priority
+                    fetchPriority="high"
                     className="w-60 md:w-70 lg:w-80 h-auto shrink-0 transition-all duration-500 group-hover:brightness-110 drop-shadow-sm"
                   />
                 </div>
