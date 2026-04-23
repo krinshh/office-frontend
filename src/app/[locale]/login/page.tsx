@@ -17,20 +17,15 @@ import Shield from 'lucide-react/dist/esm/icons/shield';
 
 // Dynamically import components to break up the initial JS payload
 const VisualImpact = dynamic(() => import('./VisualImpact').then(mod => mod.VisualImpact), {
-  ssr: false,
-  loading: () => <div className="w-full h-full" />
+  ssr: true,
+  loading: () => null // Parent already handles the shell/gradients
 });
 
 const FormSkeleton = () => (
-  <div className="space-y-4 animate-pulse py-2">
-    <div className="h-12 bg-muted rounded-xl w-full" />
-    <div className="h-12 bg-muted rounded-xl w-full" />
-    <div className="flex justify-between items-center py-2">
-      <div className="h-4 bg-muted rounded w-1/4" />
-      <div className="h-4 bg-muted rounded w-1/4" />
-    </div>
-    <div className="h-12 bg-primary/20 rounded-xl w-full mt-2" />
-    <div className="h-12 bg-muted/20 rounded-xl w-full mt-2" />
+  <div className="space-y-4">
+    <div className="h-10 bg-muted/20 rounded-xl w-full" />
+    <div className="h-10 bg-muted/20 rounded-xl w-full" />
+    <div className="h-12 bg-primary/10 rounded-xl w-full mt-6" />
   </div>
 );
 
@@ -320,8 +315,6 @@ export default function LoginPage() {
                     height={80}
                     priority
                     fetchPriority="high"
-                    loading="eager"
-                    decoding="async"
                     className="w-60 md:w-70 lg:w-80 h-auto shrink-0 transition-all duration-500 group-hover:brightness-110 drop-shadow-sm"
                   />
                 </div>
