@@ -273,40 +273,43 @@ export default function ForgotPasswordPage() {
                         fullWidth
                       />
 
-                      {/* CAPTCHA Field */}
-                      {captcha && (
-                        <div className="space-y-4 md:space-y-6 mb-4 md:mb-6 animate-fade-in-up">
-                          <label htmlFor="captcha-answer" className="block text-sm font-medium text-foreground mb-1.5">
-                            {t('auth.forgotPassword.securityCheck')}
-                          </label>
-                          <div className="flex flex-col mt-1.5 gap-4 p-4 bg-primary/30 rounded-xl border border-primary/50">
-                            <span className="text-xl font-mono font-black text-foreground/80 tracking-tighter">
-                              {captcha.question}
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <Input
-                                id="captcha-answer"
-                                type="text"
-                                required
-                                value={captchaAnswer}
-                                className="!bg-card"
-                                onChange={(e) => setCaptchaAnswer(e.target.value)}
-                                placeholder={t('auth.forgotPassword.enterAnswer')}
-                                error={errors.captcha}
-                                fullWidth
-                              />
-                              <button
-                                type="button"
-                                onClick={fetchCaptcha}
-                                className="p-2 text-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
-                                title="Refresh"
-                              >
-                                <RefreshCw className="w-5 h-5" />
-                              </button>
-                            </div>
+                      {/* CAPTCHA Field - Always rendered to prevent CLS */}
+                      <div className="space-y-4 md:space-y-6 mb-4 md:mb-6 animate-fade-in-up">
+                        <label htmlFor="captcha-answer" className="block text-sm font-medium text-foreground mb-1.5">
+                          {t('auth.forgotPassword.securityCheck')}
+                        </label>
+                        <div className="flex flex-col mt-1.5 gap-4 p-4 bg-primary/30 rounded-xl border border-primary/50 relative overflow-hidden">
+                          <span className={`text-xl font-mono font-black tracking-tighter transition-opacity duration-300 ${captcha ? 'text-foreground/80' : 'text-transparent select-none'}`}>
+                            {captcha ? captcha.question : '00 + 00 = ?'}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              id="captcha-answer"
+                              type="text"
+                              required
+                              disabled={!captcha || loading}
+                              value={captchaAnswer}
+                              className="!bg-card"
+                              onChange={(e) => setCaptchaAnswer(e.target.value)}
+                              placeholder={t('auth.forgotPassword.enterAnswer')}
+                              error={errors.captcha}
+                              fullWidth
+                            />
+                            <button
+                              type="button"
+                              onClick={fetchCaptcha}
+                              disabled={!captcha || loading}
+                              className="p-2 text-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all disabled:opacity-50"
+                              title="Refresh"
+                            >
+                              <RefreshCw className={`w-5 h-5 ${!captcha || loading ? 'animate-spin' : ''}`} />
+                            </button>
                           </div>
+                          {!captcha && (
+                            <div className="absolute inset-0 bg-primary/5 animate-pulse pointer-events-none" />
+                          )}
                         </div>
-                      )}
+                      </div>
                     </div>
 
                     <Button
