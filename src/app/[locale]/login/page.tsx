@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import NextImage from 'next/image';
 import Alert from '@/components/Alert';
-import Image from '@/components/Image';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useAuthStore } from '@/lib/store';
@@ -21,12 +20,22 @@ const VisualImpact = dynamic(() => import('./VisualImpact').then(mod => mod.Visu
   loading: () => <div className="hidden lg:flex w-full lg:w-1/2 h-full bg-slate-900" />
 });
 
+const FormSkeleton = () => (
+  <div className="space-y-4 animate-pulse">
+    <div className="h-10 bg-muted rounded-xl w-full" />
+    <div className="h-10 bg-muted rounded-xl w-full" />
+    <div className="h-12 bg-primary/20 rounded-xl w-full mt-6" />
+  </div>
+);
+
 const PasswordLoginForm = dynamic(() => import('./PasswordLoginForm').then(mod => mod.PasswordLoginForm), {
-  ssr: true
+  ssr: true,
+  loading: () => <FormSkeleton />
 });
 
 const OTPLoginForm = dynamic(() => import('./OTPLoginForm').then(mod => mod.OTPLoginForm), {
-  ssr: true
+  ssr: true,
+  loading: () => <FormSkeleton />
 });
 
 export default function LoginPage() {
@@ -43,9 +52,16 @@ export default function LoginPage() {
   const [step, setStep] = useState<'credentials' | 'otp'>('credentials');
   const [rememberMe, setRememberMe] = useState(false);
 
+  const [isDesktop, setIsDesktop] = useState(false);
+
   // Performance Optimization: Defer non-critical initializations
   useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+
     const deferInitialization = () => {
+      // Check for desktop environment using the exact Tailwind 'lg' breakpoint
+      setIsDesktop(mediaQuery.matches);
+
       // Load remembered username
       const savedUsername = localStorage.getItem('rememberedUsername');
       if (savedUsername) {
@@ -63,6 +79,10 @@ export default function LoginPage() {
     } else {
       setTimeout(deferInitialization, 1);
     }
+
+    const handleMediaQueryChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mediaQuery.addEventListener('change', handleMediaQueryChange);
+    return () => mediaQuery.removeEventListener('change', handleMediaQueryChange);
   }, []);
 
   // Performance Optimization: Defer auth check to prevent hydration blocking
@@ -245,8 +265,8 @@ export default function LoginPage() {
 
   return (
     <main className="w-full h-screen flex flex-col lg:flex-row overflow-hidden bg-background">
-      {/* Left Panel: Optimized via Dynamic Import & Memoization */}
-      <VisualImpact />
+      {/* Left Panel: Optimized via Dynamic Import & Conditional Rendering */}
+      {isDesktop && <VisualImpact />}
 
       {/* Right Panel: Content */}
       <div className="w-full lg:w-1/2 min-h-screen overflow-y-auto relative bg-background">
@@ -271,6 +291,7 @@ export default function LoginPage() {
                     width={320}
                     height={80}
                     priority
+                    fetchPriority="high"
                     className="w-60 md:w-70 lg:w-80 h-auto shrink-0 transition-all duration-500 group-hover:brightness-110 drop-shadow-sm"
                   />
                 </div>
@@ -341,12 +362,7 @@ export default function LoginPage() {
                 />
               )}
 
-              <p className="text-xs text-muted-foreground sm:leading-none mt-4">
-                {t.rich('auth.login.termsAndPrivacy', {
-                  terms: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>,
-                  privacy: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>
-                })}
-              </p>
+              {TermsBlock}
               {/* 
               <div className="mt-12">
                 <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">
