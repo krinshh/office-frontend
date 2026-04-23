@@ -72,6 +72,7 @@ export default function LoginPage() {
 
   // Performance Optimization: Defer auth check to prevent hydration blocking
   useEffect(() => {
+    // Only perform auto-logout if the user was ALREADY authenticated when they arrived
     if (!isAuthenticated) return;
 
     const performAutoLogout = async () => {
@@ -88,7 +89,8 @@ export default function LoginPage() {
 
     const timer = setTimeout(performAutoLogout, 0);
     return () => clearTimeout(timer);
-  }, [isAuthenticated, logout]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run ONLY on mount
 
   const handleSendOTP = useCallback(async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
