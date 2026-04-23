@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import NextImage from 'next/image';
 import Alert from '@/components/Alert';
+import Image from '@/components/Image';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useAuthStore } from '@/lib/store';
@@ -13,30 +14,19 @@ import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { api } from '@/lib/api';
 import Lock from 'lucide-react/dist/esm/icons/lock';
 import Mail from 'lucide-react/dist/esm/icons/mail';
-import Shield from 'lucide-react/dist/esm/icons/shield';
 
 // Dynamically import components to break up the initial JS payload
 const VisualImpact = dynamic(() => import('./VisualImpact').then(mod => mod.VisualImpact), {
   ssr: true,
-  loading: () => null // Parent already handles the shell/gradients
+  loading: () => <div className="hidden lg:flex w-full lg:w-1/2 h-full bg-slate-900" />
 });
 
-const FormSkeleton = () => (
-  <div className="space-y-4">
-    <div className="h-10 bg-muted/20 rounded-xl w-full" />
-    <div className="h-10 bg-muted/20 rounded-xl w-full" />
-    <div className="h-12 bg-primary/10 rounded-xl w-full mt-6" />
-  </div>
-);
-
 const PasswordLoginForm = dynamic(() => import('./PasswordLoginForm').then(mod => mod.PasswordLoginForm), {
-  ssr: true,
-  loading: () => <FormSkeleton />
+  ssr: true
 });
 
 const OTPLoginForm = dynamic(() => import('./OTPLoginForm').then(mod => mod.OTPLoginForm), {
-  ssr: true,
-  loading: () => <FormSkeleton />
+  ssr: true
 });
 
 export default function LoginPage() {
@@ -53,16 +43,9 @@ export default function LoginPage() {
   const [step, setStep] = useState<'credentials' | 'otp'>('credentials');
   const [rememberMe, setRememberMe] = useState(false);
 
-  const [isDesktop, setIsDesktop] = useState(false);
-
   // Performance Optimization: Defer non-critical initializations
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(min-width: 1024px)');
-
     const deferInitialization = () => {
-      // Check for desktop environment using the exact Tailwind 'lg' breakpoint
-      setIsDesktop(mediaQuery.matches);
-
       // Load remembered username
       const savedUsername = localStorage.getItem('rememberedUsername');
       if (savedUsername) {
@@ -80,10 +63,6 @@ export default function LoginPage() {
     } else {
       setTimeout(deferInitialization, 1);
     }
-
-    const handleMediaQueryChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mediaQuery.addEventListener('change', handleMediaQueryChange);
-    return () => mediaQuery.removeEventListener('change', handleMediaQueryChange);
   }, []);
 
   // Performance Optimization: Defer auth check to prevent hydration blocking
@@ -266,30 +245,8 @@ export default function LoginPage() {
 
   return (
     <main className="w-full h-screen flex flex-col lg:flex-row overflow-hidden bg-background">
-      <div className="hidden lg:flex w-full lg:w-1/2 h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex-col items-center justify-center p-8 relative overflow-hidden text-white">
-        {/* Static Background Layer */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-tr from-blue-900 to-transparent" />
-        
-        {/* Dynamic Heavy Assets (Image, Pulse Animation) hydrated on desktop */}
-        {isDesktop && <VisualImpact />}
-
-        {/* Static Content Shell for Instant Speed Index */}
-        <div className="relative z-20 flex flex-col justify-end p-10 w-full h-full">
-          <div className="mb-4 xl:mb-8 inline-flex items-center gap-3 px-4 py-2 backdrop-blur-md bg-white/10 rounded-full border border-white/20 self-start">
-            <Shield className="w-4 h-4 xl:w-5 xl:h-5" />
-            <span className="text-[10px] xl:text-sm font-bold tracking-wider uppercase">Enterprise Grade Security</span>
-          </div>
-          <div className="max-w-2xl">
-            <h1 className="text-4xl xl:text-7xl lg:text-5xl font-black mb-4 xl:mb-8 leading-[1.1] tracking-tighter drop-shadow-2xl">
-              Office Management <br />
-              <span className="text-white underline decoration-white/30 underline-offset-8">Simplified.</span>
-            </h1>
-            <p className="text-lg xl:text-2xl text-white font-medium leading-relaxed">
-              Manage your teams, synchronize attendance, and automate payroll with absolute precision.
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Left Panel: Optimized via Dynamic Import & Memoization */}
+      <VisualImpact />
 
       {/* Right Panel: Content */}
       <div className="w-full lg:w-1/2 min-h-screen overflow-y-auto relative bg-background">
@@ -314,7 +271,6 @@ export default function LoginPage() {
                     width={320}
                     height={80}
                     priority
-                    fetchPriority="high"
                     className="w-60 md:w-70 lg:w-80 h-auto shrink-0 transition-all duration-500 group-hover:brightness-110 drop-shadow-sm"
                   />
                 </div>
@@ -385,7 +341,12 @@ export default function LoginPage() {
                 />
               )}
 
-              {TermsBlock}
+              <p className="text-xs text-muted-foreground sm:leading-none mt-4">
+                {t.rich('auth.login.termsAndPrivacy', {
+                  terms: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>,
+                  privacy: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>
+                })}
+              </p>
               {/* 
               <div className="mt-12">
                 <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">
