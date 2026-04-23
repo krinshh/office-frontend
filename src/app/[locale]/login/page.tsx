@@ -233,6 +233,16 @@ export default function LoginPage() {
     }
   }, [username, password, rememberMe, clearErrors, setIsLoading, handleError, login, router, t]);
 
+  // Memoize terms and privacy block to prevent re-parsing during hydration
+  const TermsBlock = useMemo(() => (
+    <p className="text-xs text-muted-foreground sm:leading-none mt-4">
+      {t.rich('auth.login.termsAndPrivacy', {
+        terms: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>,
+        privacy: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>
+      })}
+    </p>
+  ), [t]);
+
   return (
     <main className="w-full h-screen flex flex-col lg:flex-row overflow-hidden bg-background">
       {/* Left Panel: Optimized via Dynamic Import & Memoization */}
