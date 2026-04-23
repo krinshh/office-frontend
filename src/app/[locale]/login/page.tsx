@@ -13,11 +13,12 @@ import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { api } from '@/lib/api';
 import Lock from 'lucide-react/dist/esm/icons/lock';
 import Mail from 'lucide-react/dist/esm/icons/mail';
+import Shield from 'lucide-react/dist/esm/icons/shield';
 
 // Dynamically import components to break up the initial JS payload
 const VisualImpact = dynamic(() => import('./VisualImpact').then(mod => mod.VisualImpact), {
   ssr: true,
-  loading: () => <div className="hidden lg:flex w-full lg:w-1/2 h-full bg-slate-900" />
+  loading: () => <div className="w-full h-full" />
 });
 
 const FormSkeleton = () => (
@@ -265,10 +266,29 @@ export default function LoginPage() {
 
   return (
     <main className="w-full h-screen flex flex-col lg:flex-row overflow-hidden bg-background">
-      {/* Left Panel: Optimized via Dynamic Import & Conditional Hydration. 
-          The wrapper div prevents CLS by reserving space on 'lg' screens. */}
-      <div className="hidden lg:flex w-full lg:w-1/2 h-screen bg-slate-900">
+      <div className="hidden lg:flex w-full lg:w-1/2 h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex-col items-center justify-center p-8 relative overflow-hidden text-white">
+        {/* Static Background Layer */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-tr from-blue-900 to-transparent" />
+        
+        {/* Dynamic Heavy Assets (Image, Pulse Animation) hydrated on desktop */}
         {isDesktop && <VisualImpact />}
+
+        {/* Static Content Shell for Instant Speed Index */}
+        <div className="relative z-20 flex flex-col justify-end p-10 w-full h-full">
+          <div className="mb-4 xl:mb-8 inline-flex items-center gap-3 px-4 py-2 backdrop-blur-md bg-white/10 rounded-full border border-white/20 self-start">
+            <Shield className="w-4 h-4 xl:w-5 xl:h-5" />
+            <span className="text-[10px] xl:text-sm font-bold tracking-wider uppercase">Enterprise Grade Security</span>
+          </div>
+          <div className="max-w-2xl">
+            <h1 className="text-4xl xl:text-7xl lg:text-5xl font-black mb-4 xl:mb-8 leading-[1.1] tracking-tighter drop-shadow-2xl">
+              Office Management <br />
+              <span className="text-white underline decoration-white/30 underline-offset-8">Simplified.</span>
+            </h1>
+            <p className="text-lg xl:text-2xl text-white font-medium leading-relaxed">
+              Manage your teams, synchronize attendance, and automate payroll with absolute precision.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Right Panel: Content */}
