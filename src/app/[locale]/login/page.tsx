@@ -42,11 +42,6 @@ export default function LoginPage() {
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'credentials' | 'otp'>('credentials');
   const [rememberMe, setRememberMe] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Performance Optimization: Defer non-critical initializations
   useEffect(() => {
@@ -249,7 +244,7 @@ export default function LoginPage() {
   ), [t]);
 
   return (
-    <main className={`w-full h-screen flex flex-col lg:flex-row overflow-hidden bg-background transition-opacity duration-300 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+    <main className="w-full h-screen flex flex-col lg:flex-row overflow-hidden bg-background">
       {/* Left Panel: Optimized via Dynamic Import & Memoization */}
       <VisualImpact />
 
@@ -346,12 +341,7 @@ export default function LoginPage() {
                 />
               )}
 
-              <p className="text-xs text-muted-foreground sm:leading-none mt-4">
-                {t.rich('auth.login.termsAndPrivacy', {
-                  terms: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>,
-                  privacy: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>
-                })}
-              </p>
+              {TermsBlock}
               {/* 
               <div className="mt-12">
                 <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">
