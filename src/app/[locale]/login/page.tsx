@@ -57,7 +57,7 @@ export default function LoginPage() {
         setUsername(savedUsername);
         setRememberMe(true);
       }
-      
+
       // Pre-fetch CSRF token session (low priority)
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' }).catch(() => { });
     };
@@ -102,11 +102,11 @@ export default function LoginPage() {
     }
 
     try {
-       const csrfCookie = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
-       if (!csrfCookie) {
-         await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' });
-       }
-       const csrfToken = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)?.[1] ?? '';
+      const csrfCookie = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
+      if (!csrfCookie) {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`, { credentials: 'include' });
+      }
+      const csrfToken = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)?.[1] ?? '';
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/send-otp`, {
         method: 'POST',
@@ -344,7 +344,12 @@ export default function LoginPage() {
                 />
               )}
 
-              {TermsBlock}
+              <p className="text-xs text-muted-foreground sm:leading-none mt-4">
+                {t.rich('auth.login.termsAndPrivacy', {
+                  terms: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>,
+                  privacy: (chunks) => <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-bold">{chunks}</a>
+                })}
+              </p>
               {/* 
               <div className="mt-12">
                 <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">
