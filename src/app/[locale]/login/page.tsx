@@ -342,7 +342,6 @@ export default function LoginPage() {
               )}
 
               {TermsBlock}
-              accds
               {/* 
               <div className="mt-12">
                 <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">
