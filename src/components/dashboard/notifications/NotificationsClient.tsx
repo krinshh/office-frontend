@@ -161,7 +161,7 @@ export function NotificationsClient() {
             </div>
           ) : !isFetching.list && (
             <div className="py-12 flex flex-col items-center">
-              <EmptyNotifications />
+              <EmptyNotifications variant="secondary" />
             </div>
           )}
         </div>

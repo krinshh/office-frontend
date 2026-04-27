@@ -349,7 +349,7 @@ export function UserAttendanceClient() {
                     </div>
                   ))}
                 </div>
-              ) : (!attendanceFetching.myAttendance && <EmptyAttendance onMarkAttendance={() => handleMarkIn()} />)}
+              ) : (!attendanceFetching.myAttendance && <EmptyAttendance onMarkAttendance={() => handleMarkIn()} variant="secondary" />)}
             </div>
           </div>
         </Card>

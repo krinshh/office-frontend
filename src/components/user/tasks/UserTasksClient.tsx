@@ -189,7 +189,7 @@ export function UserTasksClient() {
           })
         ) : !loading && (
           <div className="col-span-full flex justify-center min-h-[60vh]">
-            <EmptyTasks isAdmin={false} />
+            <EmptyTasks isAdmin={false} variant="secondary" />
           </div>
         )}
       </div>
