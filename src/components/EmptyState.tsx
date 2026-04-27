@@ -25,25 +25,25 @@ const getVariantColors = (variant: 'primary' | 'secondary' | 'warning' | 'danger
   const colors = {
     primary: {
       bgLight: 'bg-primary/10',
-      text: 'text-primary',
+      text: 'text-primary-foreground',
       bg: 'bg-primary',
       textFg: 'text-primary-foreground'
     },
     secondary: {
       bgLight: 'bg-secondary',
       text: 'text-secondary-foreground',
-      bg: 'bg-secondary-foreground/20',
+      bg: 'bg-secondary',
       textFg: 'text-secondary-foreground'
     },
     warning: {
       bgLight: 'bg-warning/10',
-      text: 'text-warning',
+      text: 'text-warning-foreground',
       bg: 'bg-warning',
       textFg: 'text-warning-foreground'
     },
     danger: {
       bgLight: 'bg-destructive/10',
-      text: 'text-destructive',
+      text: 'text-destructive-foreground',
       bg: 'bg-destructive',
       textFg: 'text-destructive-foreground'
     }
